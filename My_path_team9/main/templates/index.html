@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+ 
+{% block title %}Welcome{% endblock %}
+ 
+{% block content %}
+<div class="text-center">
+<h1>Welcome to <span style="font-family: 'Courier New', monospace; color: #17416D;">My_Path</span></h1>
+<p><a href="{{ url_for('auth.login') }}" class="btn btn-primary mt-3">Login to Continue</a></p>
+</div>
+
+{% endblock %}
+
+ 
