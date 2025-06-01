@@ -71,5 +71,5 @@ def register():
 @login_required
 def logout():
     logout_user()
-    flash('Logged out successfully.', 'info')
-    return redirect(url_for("main_bp.index"))
+    print('Logged out successfully.')
+    return redirect(url_for("main.home"))
