@@ -1,9 +1,31 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
+
 from . import student_bp
-from .forms import SurveyForm
+from .forms import SurveyForm, SettingsForm
 from .. import db
+from ..auth.models import User
 from .models import Survey
+
+@student_bp.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    if current_user.role != 'student':
+        return "Access denied", 403
+
+    form = SettingsForm()
+
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user and existing_user.id != current_user.id:
+            flash('This username is already taken.', 'warning')
+        else:
+            current_user.username = form.username.data
+            db.session.commit()
+            flash('Username updated successfully.', 'success')
+            return redirect(url_for('student.settings'))
+
+    return render_template('settings.html', form=form, current_user=current_user)
 
 @student_bp.route('/survey', methods=['GET', 'POST'])
 @login_required
@@ -37,6 +59,11 @@ def survey():
         db.session.add(response)
         db.session.commit()
         flash('Thank you for completing the survey.', 'success')
-        return redirect(url_for('student.survey'))  # Redirect to avoid form resubmission
+        return redirect(url_for('student.survey'))
 
     return render_template('survey.html', form=form, current_user=current_user)
+
+@student_bp.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('student_dashboard.html')

@@ -1,5 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import RadioField, SelectField, SelectMultipleField, widgets, SubmitField
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Length, EqualTo
+
 
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
@@ -108,3 +111,8 @@ class SurveyForm(FlaskForm):
     ])
 
     submit = SubmitField('Submit')
+
+
+class SettingsForm(FlaskForm):
+    username = StringField('New Username', validators=[DataRequired(), Length(min=3, max=64)])
+    submit = SubmitField('Update')
