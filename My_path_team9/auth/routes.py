@@ -21,7 +21,7 @@ def login():
             login_user(user)
 
             if user.role == 'student':
-                return redirect(url_for('student_bp.student_dashboard'))
+                return redirect(url_for('student.survey'))
 
             elif user.role == 'teacher':
                 return redirect(url_for('teacher_bp.teacher_dashboard'))

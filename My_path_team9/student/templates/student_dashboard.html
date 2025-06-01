@@ -1,29 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Student Dashboard{% endblock %}
-
 {% block content %}
-<div class="card">
-  <h2>Welcome to your Student Dashboard, {{ user.username }}!</h2>
-  <p>This is where you can access all your student-related information.</p>
-
-  <hr>
-
-  <h4>Your Courses</h4>
-  <ul>
-    <!-- Example: Loop over courses if you pass them -->
-    {% if courses %}
-      {% for course in courses %}
-        <li>{{ course.name }} - {{ course.instructor }}</li>
-      {% endfor %}
-    {% else %}
-      <li>You are not enrolled in any courses yet.</li>
-    {% endif %}
-  </ul>
-
-  <hr>
-
-
-
-</div>
+<h1>Welcome, {{ current_user.username }}!</h1>
+<p>This is your student dashboard.</p>
 {% endblock %}
