@@ -6,6 +6,8 @@ from .forms import SurveyForm, SettingsForm
 from .. import db
 from ..auth.models import User
 from .models import Survey
+from .forms import VideoSubmissionForm
+from .models import VideoSubmission
 
 @student_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -67,3 +69,25 @@ def survey():
 @login_required
 def dashboard():
     return render_template('student_dashboard.html')
+
+
+@student_bp.route('/submit', methods=['GET', 'POST'])
+@login_required
+def submit():
+    if current_user.role != 'student':
+        return "Access denied", 403
+
+    form = VideoSubmissionForm()
+
+    if form.validate_on_submit():
+        submission = VideoSubmission(
+            student_id=current_user.id,
+            video_link=form.video_link.data
+        )
+        db.session.add(submission)
+        db.session.commit()
+        flash("Video submitted successfully.", "success")
+        return redirect(url_for('student.submit'))
+
+    submissions = VideoSubmission.query.filter_by(student_id=current_user.id).all()
+    return render_template('submit.html', form=form, submissions=submissions)

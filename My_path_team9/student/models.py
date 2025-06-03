@@ -21,3 +21,14 @@ class Survey(db.Model):
     ideal_length = db.Column(db.String(20), nullable=False)
     videos_for_tests = db.Column(db.String(20), nullable=False)
     review_before_class = db.Column(db.String(20), nullable=False)
+
+
+class VideoSubmission(db.Model):
+    __tablename__ = 'video_submissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    video_link = db.Column(db.String(500), nullable=False)
+    confirmed = db.Column(db.Boolean, default=False)
+
+    student = db.relationship('User', backref='video_submissions')

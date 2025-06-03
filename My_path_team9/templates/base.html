@@ -61,7 +61,6 @@
       66% { transform: translate(-20px, 20px) rotate(240deg); }
     }
 
-
     .navbar {
       backdrop-filter: blur(20px);
       background: rgba(255, 255, 255, 0.9) !important;
@@ -70,7 +69,6 @@
       transition: all 0.3s ease;
       box-shadow: var(--shadow-light);
     }
-
 
     .navbar-brand {
       font-weight: 700;
@@ -125,6 +123,44 @@
     }
     .nav-link:hover::after {
       width: 80%;
+    }
+
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(59, 130, 246, 0.1);
+      border-radius: 12px;
+      box-shadow: var(--shadow-large);
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      animation: slideInDown 0.3s ease-out;
+    }
+
+    .dropdown-item {
+      color: var(--dark-blue);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--primary-blue);
+      transform: translateX(3px);
+    }
+
+    .dropdown-divider {
+      border-color: rgba(59, 130, 246, 0.1);
+      margin: 0.25rem 0;
+    }
+
+    .nav-item.dropdown:hover .dropdown-menu {
+      display: block;
     }
 
     /* Cards and Forms */
@@ -452,8 +488,6 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
-
   </style>
 
   {% block head %}{% endblock %}
@@ -461,81 +495,91 @@
 <body>
 
 <nav class="navbar navbar-expand-lg">
-<div class="container">
-<a class="navbar-brand" href="{{ url_for('main.home') }}">
-<img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" height="40" class="me-2">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('main.home') }}">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" height="40" class="me-2">
       My Path
-</a>
-<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-<span class="navbar-toggler-icon"></span>
-</button>
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-<ul class="navbar-nav ms-auto">
-
+      <ul class="navbar-nav ms-auto">
         {% if current_user.is_authenticated %}
           {% if current_user.role == 'student' %}
-<li class="nav-item">
-<a class="nav-link" href="{{ url_for('student.settings') }}">
-<i data-lucide="settings" style="width: 16px; height: 16px;"></i>
-                Settings
-</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="{{ url_for('student.survey') }}">
-<i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('student.survey') }}">
+                <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
                 Survey
-</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="{{ url_for('student.dashboard') }}">
-<i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('student.submit') }}">
+                <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
+                Videos
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('student.dashboard') }}">
+                <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
                 Dashboard
-</a>
-</li>
+              </a>
+            </li>
           {% endif %}
 
-          <li class="nav-item">
-<a class="nav-link" href="#">
-<i data-lucide="user" style="width: 16px; height: 16px;"></i>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i data-lucide="user" style="width: 16px; height: 16px;"></i>
               {{ current_user.username }}
-</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="{{ url_for('auth.logout') }}">
-<i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
-              Logout
-</a>
-</li>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+              {% if current_user.role == 'student' %}
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('student.settings') }}">
+                    <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+                    Settings
+                  </a>
+                </li>
+              {% endif %}
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                  <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </li>
 
         {% else %}
-<li class="nav-item">
-<a class="nav-link" href="{{ url_for('auth.login') }}">
-<i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.login') }}">
+              <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
               Login
-</a>
-</li>
-<li class="nav-item">
-<a class="nav-link" href="{{ url_for('auth.register') }}">
-<i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.register') }}">
+              <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
               Register
-</a>
-</li>
+            </a>
+          </li>
         {% endif %}
-
       </ul>
-</div>
-</div>
+    </div>
+  </div>
 </nav>
+
 <div class="container">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
-<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
           {{ message }}
-<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
       {% endfor %}
     {% endif %}
   {% endwith %}
@@ -545,10 +589,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
   document.addEventListener('DOMContentLoaded', function() {
     lucide.createIcons();
-
 
     const cards = document.querySelectorAll('.card, form');
     cards.forEach(card => {
@@ -561,7 +603,6 @@
       });
     });
 
-
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
       form.addEventListener('submit', function() {
@@ -570,7 +611,6 @@
           submitBtn.classList.add('loading');
           submitBtn.disabled = true;
 
-
           setTimeout(() => {
             submitBtn.classList.remove('loading');
             submitBtn.disabled = false;
@@ -578,7 +618,6 @@
         }
       });
     });
-
 
     const inputs = document.querySelectorAll('.form-control, .form-select');
     inputs.forEach(input => {
