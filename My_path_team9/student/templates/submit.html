@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Submit Video{% endblock %}
+
+{% block content %}
+<h2>Submit an English Video</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.video_link.label }}<br>
+        {{ form.video_link(size=80) }}
+        {% for error in form.video_link.errors %}
+            <span style="color:red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    {{ form.submit() }}
+</form>
+
+<hr>
+
+<h3>Your Submitted Videos</h3>
+<ul>
+    {% for item in submissions %}
+        <li>
+            <a href="{{ item.video_link }}" target="_blank">{{ item.video_link }}</a>
+            {% if item.confirmed %}
+                - ✅ Confirmed
+            {% else %}
+                - ⏳ Awaiting Confirmation
+            {% endif %}
+        </li>
+    {% else %}
+        <li>No submissions yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
