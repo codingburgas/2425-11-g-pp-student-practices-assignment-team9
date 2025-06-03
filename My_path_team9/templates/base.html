@@ -458,4 +458,75 @@
 
   {% block head %}{% endblock %}
 </head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+<div class="container">
+<a class="navbar-brand" href="{{ url_for('main.home') }}">
+<img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" height="40" class="me-2">
+      My Path
+</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ms-auto">
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.role == 'student' %}
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('student.settings') }}">
+<i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+                Settings
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('student.survey') }}">
+<i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
+                Survey
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('student.dashboard') }}">
+<i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+                Dashboard
+</a>
+</li>
+          {% endif %}
+
+          <li class="nav-item">
+<a class="nav-link" href="#">
+<i data-lucide="user" style="width: 16px; height: 16px;"></i>
+              {{ current_user.username }}
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('auth.logout') }}">
+<i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+              Logout
+</a>
+</li>
+
+        {% else %}
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('auth.login') }}">
+<i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+              Login
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('auth.register') }}">
+<i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+              Register
+</a>
+</li>
+        {% endif %}
+
+      </ul>
+</div>
+</div>
+</nav>
+</body>
 </html>
