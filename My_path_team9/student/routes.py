@@ -91,3 +91,8 @@ def submit():
 
     submissions = VideoSubmission.query.filter_by(student_id=current_user.id).all()
     return render_template('submit.html', form=form, submissions=submissions)
+
+@student_bp.route('/tips')
+@login_required
+def tips():
+    return render_template('tips.html')
