@@ -96,3 +96,8 @@ def submit():
 @login_required
 def tips():
     return render_template('tips.html')
+
+@student_bp.route('/classes')
+@login_required
+def classes():
+    return render_template('classes.html')
