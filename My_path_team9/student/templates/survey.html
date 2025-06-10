@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form action="{{ url_for('student.survey') }}" method="POST">
+    {{ form.csrf_token }}
+
+    <h2>Student Survey</h2>
+
+    <div class="question">
+        <label>Which class and section are you in?</label><br>
+        <input type="radio" name="class_section" value="9A"> 9A<br>
+        <input type="radio" name="class_section" value="9B"> 9B<br>
+        <input type="radio" name="class_section" value="9C"> 9V<br>
+        <input type="radio" name="class_section" value="9D"> 9G
+    </div>
+<br>
+    <div class="question">
+        <label>How many hours a day do you study outside school?</label><br>
+        <input type="radio" name="study_time" value="under_1"> Less than 1 hour<br>
+        <input type="radio" name="study_time" value="1_2"> 1–2 hours<br>
+        <input type="radio" name="study_time" value="2_3"> 2–3 hours<br>
+        <input type="radio" name="study_time" value="over_3"> More than 3 hours
+    </div>
+<br>
+    <div class="question">
+        <label>How interested are you in the school material?</label><br>
+        <input type="radio" name="interest_level" value="very_high"> Very high<br>
+        <input type="radio" name="interest_level" value="medium"> Medium<br>
+        <input type="radio" name="interest_level" value="low"> Low<br>
+        <input type="radio" name="interest_level" value="none"> Not interested
+    </div>
+<br>
+    <div class="question">
+        <label>How confident do you feel before tests/exams?</label><br>
+        <input type="radio" name="confidence" value="very"> Very confident<br>
+        <input type="radio" name="confidence" value="moderate"> Moderately confident<br>
+        <input type="radio" name="confidence" value="low"> Not very confident<br>
+        <input type="radio" name="confidence" value="stressed"> Stressed
+    </div>
+<br>
+    <div class="question">
+        <label>What’s your easiest way to remember information?</label><br>
+        <input type="radio" name="memory_method" value="notes"> Taking notes<br>
+        <input type="radio" name="memory_method" value="videos"> Watching videos<br>
+        <input type="radio" name="memory_method" value="repetition"> Repeating information
+    </div>
+<br>
+    <div class="question">
+        <label>How often do you use online learning resources (e.g., YouTube, video lessons)?</label><br>
+        <input type="radio" name="online_learning" value="daily"> Daily<br>
+        <input type="radio" name="online_learning" value="few_times"> Several times a week<br>
+        <input type="radio" name="online_learning" value="rarely"> Rarely<br>
+        <input type="radio" name="online_learning" value="never"> Never
+    </div>
+<br>
+    <div class="question">
+        <label>Which subject do you find most difficult?</label><br>
+        <select name="hardest_subject">
+            <option value="Natural sciences">Natural sciences</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="languages">Languages</option>
+            <option value="social sciences">Social sciences</option>
+            <option value="Computer sciences">Computer sciences</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+<br>
+    <div class="question">
+        <label>What is your favorite school subject?</label><br>
+        <select name="favorite_subject">
+            <option value="Natural sciences">Natural sciences</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="languages">Languages</option>
+            <option value="social sciences">Social sciences</option>
+            <option value="Computer sciences">Computer sciences</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+<br>
+    <div class="question">
+        <label>How much time do you spend on social media/games daily?</label><br>
+        <input type="radio" name="social_time" value="under_1"> Less than 1 hour<br>
+        <input type="radio" name="social_time" value="1_3"> 1–3 hours<br>
+        <input type="radio" name="social_time" value="over_3"> More than 3 hours
+    </div>
+<br>
+    <div class="question">
+        <label>Which platforms do you use most for video lessons?</label><br>
+        <input type="checkbox" name="video_platforms" value="youtube"> YouTube<br>
+        <input type="checkbox" name="video_platforms" value="ucha_se"> Ucha.se<br>
+        <input type="checkbox" name="video_platforms" value="khan"> Khan Academy<br>
+        <input type="checkbox" name="video_platforms" value="online_school"> Online School
+    </div>
+<br>
+    <div class="question">
+        <label>Do video lessons help you understand the material better?</label><br>
+        <input type="radio" name="video_helpful" value="very"> Very much<br>
+        <input type="radio" name="video_helpful" value="somewhat"> Somewhat<br>
+        <input type="radio" name="video_helpful" value="not_much"> Not really<br>
+        <input type="radio" name="video_helpful" value="not_at_all"> Not at all
+    </div>
+<br>
+    <div class="question">
+        <label>What are the most important qualities of a good video lesson?</label><br>
+        <input type="checkbox" name="lesson_quality" value="short_clear"> Short and clear<br>
+        <input type="checkbox" name="lesson_quality" value="examples"> With examples and exercises<br>
+        <input type="checkbox" name="lesson_quality" value="visuals"> With visuals and animations<br>
+        <input type="checkbox" name="lesson_quality" value="slow_clear"> Explained slowly and clearly
+    </div>
+<br>
+    <div class="question">
+        <label>What is the ideal length of a video lesson?</label><br>
+        <input type="radio" name="ideal_length" value="under_5"> Less than 5 minutes<br>
+        <input type="radio" name="ideal_length" value="5_10"> 5–10 minutes<br>
+        <input type="radio" name="ideal_length" value="10_20"> 10–20 minutes<br>
+        <input type="radio" name="ideal_length" value="doesnt_matter"> Doesn’t matter as long as it’s useful
+    </div>
+<br>
+    <div class="question">
+        <label>Do you watch video lessons when preparing for tests?</label><br>
+        <input type="radio" name="videos_for_tests" value="always"> Always<br>
+        <input type="radio" name="videos_for_tests" value="sometimes"> Sometimes<br>
+        <input type="radio" name="videos_for_tests" value="only_if_needed"> Only if I don’t understand<br>
+        <input type="radio" name="videos_for_tests" value="never"> Never
+    </div>
+<br>
+    <div class="question">
+        <label>How often do you review lessons before class?</label><br>
+        <input type="radio" name="review_before_class" value="always"> Always<br>
+        <input type="radio" name="review_before_class" value="sometimes"> Sometimes<br>
+        <input type="radio" name="review_before_class" value="never"> Never
+    </div>
+<br>
+    <div class="submit">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+{% endblock %}

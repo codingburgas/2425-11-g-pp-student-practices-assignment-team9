@@ -1,3 +1,5 @@
+from urllib import request
+
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from . import auth_bp
@@ -21,7 +23,7 @@ def login():
             login_user(user)
 
             if user.role == 'student':
-                return redirect(url_for('student_bp.student_dashboard'))
+                return redirect(url_for('student.survey'))
 
             elif user.role == 'teacher':
                 return redirect(url_for('teacher_bp.teacher_dashboard'))
@@ -71,5 +73,5 @@ def register():
 @login_required
 def logout():
     logout_user()
-    flash('Logged out successfully.', 'info')
-    return redirect(url_for("main_bp.index"))
+    print('Logged out successfully.')
+    return redirect(url_for("main.home"))

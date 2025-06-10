@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Tips{% endblock %}
+
+{% block content %}
+<style>
+  .content-box {
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    margin: 20px auto;
+  }
+
+  .section {
+    margin-top: 10px;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+</style>
+
+<h1>Tips</h1><br>
+
+<div class="content-box">
+  <div class="section">
+    <h2>Study Techniques</h2>
+    <ul>
+      <li>Use the Pomodoro Technique: Study for 25 minutes, then take a 5-minute break.</li>
+      <li>Teach someone else: Explaining concepts out loud helps solidify understanding.</li>
+      <li>Use active recall and spaced repetition for long-term retention.</li>
+      <li>Create mind maps and diagrams to visualize information.</li>
+      <li>Summarize chapters in your own words.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="content-box">
+  <div class="section">
+    <h2>Time Management Tips</h2>
+    <ul>
+      <li>Set SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound).</li>
+      <li>Use a planner or digital calendar to block study sessions.</li>
+      <li>Prioritize tasks with the Eisenhower Matrix: urgent vs. important.</li>
+      <li>Avoid multitasking — focus on one task at a time for better productivity.</li>
+      <li>Review your goals weekly and adjust as needed.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="content-box">
+  <div class="section">
+    <h2>Getting Help as a Student</h2>
+    <ul>
+      <li>Talk to your school counselor or psychologist if you're feeling overwhelmed, anxious, or stressed.</li>
+      <li>Reach out to a trusted teacher, mentor, or family member for support.</li>
+      <li>Join student support groups or peer mentoring programs at your school.</li>
+      <li>Utilize mental health resources provided by your school or community.</li>
+      <li>Don't hesitate to ask for help — it's a sign of strength, not weakness.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

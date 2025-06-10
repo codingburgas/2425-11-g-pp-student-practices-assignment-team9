@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% block title %}Submit Video{% endblock %}
+
+{% block content %}
+<div class="video-submit-page">
+<style>
+    .video-submit-page .video-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .video-submit-page .video-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .video-submit-page .video-header h1 {
+        color: #4285f4;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .video-submit-page .video-header p {
+        color: #666;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .video-submit-page .video-form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        border: 1px solid #e8eaed;
+    }
+
+    .video-submit-page .video-form-group {
+        margin-bottom: 20px;
+    }
+
+    .video-submit-page .video-form-label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+    .video-submit-page .video-form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e8eaed;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        background: #fafbfc;
+    }
+
+    .video-submit-page .video-form-input:focus {
+        outline: none;
+        border-color: #4285f4;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    }
+
+    .video-submit-page .video-form-input::placeholder {
+        color: #9aa0a6;
+        font-style: italic;
+    }
+
+    .video-submit-page .video-btn-submit {
+        background: linear-gradient(135deg, #4285f4, #1a73e8);
+        color: white;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+    }
+
+    .video-submit-page .video-btn-submit:hover {
+        background: linear-gradient(135deg, #1a73e8, #1557b0);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+    }
+
+    .video-submit-page .video-btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .video-submit-page .video-submissions-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        border: 1px solid #e8eaed;
+    }
+
+    .video-submit-page .video-submissions-title {
+        color: #4285f4;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .video-submit-page .video-item {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        background: #fafbfc;
+        transition: all 0.3s ease;
+    }
+
+    .video-submit-page .video-item:hover {
+        background: #f1f3f4;
+        border-color: #dadce0;
+    }
+
+    .video-submit-page .video-youtube-icon {
+        width: 30px;
+        height: 24px;
+        background: #ff0000;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    .video-submit-page .video-youtube-icon::before {
+        content: "▶";
+        color: white;
+        font-size: 12px;
+    }
+
+    .video-submit-page .video-link {
+        flex: 1;
+        color: #1a73e8;
+        text-decoration: none;
+        font-weight: 500;
+        margin-right: 12px;
+        word-break: break-all;
+    }
+
+    .video-submit-page .video-link:hover {
+        text-decoration: underline;
+    }
+
+    .video-submit-page .video-status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .video-submit-page .video-status-confirmed {
+        background: #e8f5e8;
+        color: #137333;
+    }
+
+    .video-submit-page .video-status-pending {
+        background: #fef7e0;
+        color: #b06000;
+    }
+
+    .video-submit-page .video-no-submissions {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 40px 20px;
+    }
+
+    .video-submit-page .video-error-message {
+        color: #d93025;
+        font-size: 14px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .video-submit-page .video-input-icon {
+        position: relative;
+    }
+
+    .video-submit-page .video-input-icon::before {
+        content: "🎥";
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 16px;
+        z-index: 1;
+    }
+
+    .video-submit-page .video-input-icon .video-form-input {
+        padding-left: 44px;
+    }
+</style>
+
+<div class="video-container">
+<div class="video-header">
+<h1>Submit Video</h1>
+<p>Share your content with enhanced validation and real-time feedback</p>
+</div>
+
+    <div class="video-form-card">
+<form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="video-form-group">
+<label class="video-form-label" for="{{ form.video_link.id }}">Video Link</label>
+<div class="video-input-icon">
+                    {{ form.video_link(class="video-form-input", placeholder="Paste your YouTube, Vimeo, or other video URL here...") }}
+</div>
+                {% for error in form.video_link.errors %}
+<span class="video-error-message">{{ error }}</span>
+                {% endfor %}
+</div>
+
+            {{ form.submit(class="video-btn-submit", value="Submit Video") }}
+</form>
+</div>
+
+    <div class="video-submissions-card">
+<h3 class="video-submissions-title">
+            📁 Your Submitted Videos
+</h3>
+
+        {% if submissions %}
+            {% for item in submissions %}
+<div class="video-item">
+<div class="video-youtube-icon"></div>
+<a href="{{ item.video_link }}" target="_blank" class="video-link">
+                        {{ item.video_link }}
+</a>
+                    {% if item.confirmed %}
+<span class="video-status-badge video-status-confirmed">
+                            ✅ Confirmed
+</span>
+                    {% else %}
+<span class="video-status-badge video-status-pending">
+                            ⏳ Awaiting Confirmation
+</span>
+                    {% endif %}
+</div>
+            {% endfor %}
+        {% else %}
+<div class="video-no-submissions">
+                No submissions yet. Submit your first video above!
+</div>
+        {% endif %}
+</div>
+</div>
+</div>
+{% endblock %}
