@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import RadioField, SelectField, SelectMultipleField, widgets, SubmitField
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length, EqualTo
+from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional
 from wtforms.validators import URL
 
 class MultiCheckboxField(SelectMultipleField):
@@ -114,9 +114,15 @@ class SurveyForm(FlaskForm):
 
 
 class SettingsForm(FlaskForm):
-    username = StringField('New Username', validators=[DataRequired(), Length(min=3, max=64)])
-    submit = SubmitField('Update')
-
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    current_password = PasswordField('Current Password', validators=[Optional()])
+    new_password = PasswordField('New Password', validators=[Optional()])
+    confirm_password = PasswordField('Confirm New Password', validators=[
+        Optional(),
+        EqualTo('new_password', message='Passwords must match')
+    ])
+    submit = SubmitField('Save Changes')
 class VideoSubmissionForm(FlaskForm):
     video_link = StringField('Video Link', validators=[
         DataRequired(), URL(), Length(max=500)

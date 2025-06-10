@@ -15,17 +15,38 @@ def settings():
     if current_user.role != 'student':
         return "Access denied", 403
 
-    form = SettingsForm()
+    form = SettingsForm(obj=current_user)
 
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user and existing_user.id != current_user.id:
-            flash('This username is already taken.', 'warning')
-        else:
-            current_user.username = form.username.data
-            db.session.commit()
-            flash('Username updated successfully.', 'success')
+        # Check for username/email conflicts
+        if User.query.filter(User.username == form.username.data, User.id != current_user.id).first():
+            flash('Username already taken.', 'warning')
             return redirect(url_for('student.settings'))
+
+        if User.query.filter(User.email == form.email.data, User.id != current_user.id).first():
+            flash('Email already in use.', 'warning')
+            return redirect(url_for('student.settings'))
+
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+
+        # Change password only if fields are filled
+        if form.new_password.data:
+            if not form.current_password.data:
+                flash('Current password is required to change your password.', 'warning')
+            elif not current_user.verify_password(form.current_password.data):
+                flash('Current password is incorrect.', 'danger')
+            else:
+                try:
+                    current_user.password = form.new_password.data
+                    flash('Password changed successfully.', 'success')
+                except ValueError as ve:
+                    flash(str(ve), 'danger')
+                    return redirect(url_for('student.settings'))
+
+        db.session.commit()
+        flash('Profile updated successfully.', 'success')
+        return redirect(url_for('student.settings'))
 
     return render_template('settings.html', form=form, current_user=current_user)
 
