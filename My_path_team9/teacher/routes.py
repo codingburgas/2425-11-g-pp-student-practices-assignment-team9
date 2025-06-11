@@ -1,5 +1,7 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash
+
 from .. import db
 from ..auth.models import User
 from ..student.forms import SettingsForm
@@ -81,3 +83,36 @@ def settings_teacher():
         return redirect(url_for('teacher.settings_teacher'))
 
     return render_template('settings_teacher.html', form=form, current_user=current_user)
+
+@teacher_bp.route('/students', methods=['GET', 'POST'])
+@login_required
+def students_list():
+    if current_user.role != 'teacher':
+        flash('You do not have access to this page.', 'danger')
+        return redirect(url_for('main.home'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        if not username or not email or not password:
+            flash('All fields are required.', 'warning')
+        elif User.query.filter_by(email=email).first():
+            flash('Email already exists.', 'danger')
+        elif User.query.filter_by(username=username).first():
+            flash('Username already exists.', 'danger')
+        else:
+            new_student = User(
+                username=username,
+                email=email,
+                password=generate_password_hash(password),
+                role='student'
+            )
+            db.session.add(new_student)
+            db.session.commit()
+            flash('Student account created successfully.', 'success')
+            return redirect(url_for('teacher.students_list'))
+
+    students = User.query.filter_by(role='student').all()
+    return render_template('students.html', students=students)
