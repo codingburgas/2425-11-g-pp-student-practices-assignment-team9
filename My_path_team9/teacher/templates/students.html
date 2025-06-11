@@ -7,14 +7,14 @@
     border-spacing: 0;
     border-radius: 12px;
     overflow: hidden;
-    background-color: #f9fbff; /* супер светло синьо */
+    background-color: #f9fbff;
     box-shadow: 0 6px 15px rgba(100, 110, 140, 0.08);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 100%;
   }
 
   .table-custom thead tr {
-    background-color: #e6ecff; /* много светло син фон */
+    background-color: #e6ecff;
     color: #3b4a6b;
     font-weight: 600;
     text-transform: uppercase;
@@ -38,11 +38,11 @@
   }
 
   .table-custom tbody tr:hover {
-    background-color: #d4defd; /* нежен син hover */
+    background-color: #d4defd;
     transition: background-color 0.3s ease;
   }
 
-  /* Бутона стил */
+
   .btn-outline-danger {
     border-color: #d9534f;
     color: #d9534f;
@@ -57,7 +57,24 @@
 {% endblock %}
 
 {% block content %}
-
+  <div class="container py-4">
+  <h2 class="mb-4">Add New Student</h2>
+  <form method="POST" class="row g-3 mb-5">
+    <div class="col-md-4">
+      <input type="text" name="username" class="form-control" placeholder="Username" required>
+    </div>
+    <div class="col-md-4">
+      <input type="email" name="email" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="col-md-4">
+      <input type="password" name="password" class="form-control" placeholder="Password" required>
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" class="btn btn-primary">
+        <i data-lucide="plus-circle" class="me-1" style="width: 16px; height: 16px;"></i>
+        Create Student
+      </button>
+    </div>
   </form>
 <div class="container py-4">
   <h2 class="mb-4">Students List</h2>

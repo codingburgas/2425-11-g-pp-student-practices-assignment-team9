@@ -121,15 +121,16 @@ def students_list():
 @login_required
 def delete_student(user_id):
     if current_user.role != 'teacher':
-        flash('You do not have permission to perform this action.', 'danger')
+        flash('Нямате права да извършите това действие.', 'danger')
         return redirect(url_for('main.home'))
 
     student = User.query.get_or_404(user_id)
     if student.role != 'student':
-        flash('You can only delete student accounts.', 'warning')
+        flash('Можете да изтривате само ученици.', 'warning')
         return redirect(url_for('teacher.students_list'))
 
     db.session.delete(student)
     db.session.commit()
-    flash(f'Student {student.email} was successfully deleted.', 'success')
+    flash(f'Ученикът {student.email} беше изтрит успешно.', 'success')
     return redirect(url_for('teacher.students_list'))
+
