@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% block content %}
+  <div class="container py-4">
+  <h2 class="mb-4">Add New Student</h2>
+  <form method="POST" class="row g-3 mb-5">
+    <div class="col-md-4">
+      <input type="text" name="username" class="form-control" placeholder="Username" required>
+    </div>
+    <div class="col-md-4">
+      <input type="email" name="email" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="col-md-4">
+      <input type="password" name="password" class="form-control" placeholder="Password" required>
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" class="btn btn-primary">
+        <i data-lucide="plus-circle" class="me-1" style="width: 16px; height: 16px;"></i>
+        Create Student
+      </button>
+    </div>
+  </form>
+<div class="container py-4">
+  <h2 class="mb-4">Students List</h2>
+
+  {% if students %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle shadow-sm rounded table-custom">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.username }}</td>
+          <td>{{ student.email }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('teacher.delete_student', user_id=student.id) }}" onsubmit="return confirm('Are you sure you want to delete {{ student.username }}?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Delete student {{ student.username }}">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p>No registered students.</p>
+  {% endif %}
+</div>
+{% endblock %}
