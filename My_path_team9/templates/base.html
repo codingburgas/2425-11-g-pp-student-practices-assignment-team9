@@ -567,24 +567,39 @@ body.dark-mode a {
         Dashboard
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('student.classes') }}">
-        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-        Your classes
-      </a>
-    </li>
-    <li class="nav-item">
+      <li class="nav-item">
       <a class="nav-link" href="{{ url_for('student.submit') }}">
         <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
         Videos
       </a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="studentMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+    Friends & Classes
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="studentMenu">
+    <li>
+      <a class="dropdown-item" href="{{ url_for('student.classes') }}">
+        <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
+        Your Classes
+      </a>
+    </li>
+      <li class="nav-item">
       <a class="nav-link" href="{{ url_for('student.tips') }}">
         <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
         Tips
       </a>
     </li>
+    <li>
+      <a class="dropdown-item" href="{{ url_for('student.find_friends') }}">
+        <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+        Find Friends
+      </a>
+    </li>
+  </ul>
+</li>
+
   {% elif current_user.role == 'teacher' %}
     <!-- Teacher Link -->
     <li class="nav-item">

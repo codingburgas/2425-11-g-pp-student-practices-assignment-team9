@@ -1,6 +1,5 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
-
 from . import student_bp
 from .forms import SurveyForm, SettingsForm
 from .. import db
@@ -122,3 +121,8 @@ def tips():
 @login_required
 def classes():
     return render_template('classes.html')
+
+@student_bp.route('/find_friends')
+def find_friends():
+    all_students = User.query.all()
+    return render_template('find_friends.html', students=all_students)

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 0;
+    }
+
+    .student-box {
+        width: 80%;
+        max-width: 800px;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+    }
+
+    tr:hover {
+        background-color: #e0f0ff;
+        cursor: pointer;
+    }
+
+    #student-info {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #aaa;
+        border-radius: 8px;
+        background-color: #fff;
+    }
+        .view-btn {
+        padding: 8px 16px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-size: 14px;
+    }
+
+    .view-btn:hover {
+        background-color: #0056b3;
+        cursor: pointer;
+    }
+
+</style>
+
+<div class="container">
+    <div class="student-box">
+        <h1 class="text-center mt-4 mb-3">Find friends</h1>
+        <table>
+            <div id="student-info" style="display:none;">
+            <h2 id="student-name"></h2>
+            <p><strong>Email:</strong> <span id="student-email"></span></p>
+            <p><strong>Role:</strong> <span id="student-role"></span></p>
+        </div>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr onclick="showStudentInfo({
+                    id: {{ student.id }},
+                    username: '{{ student.username }}',
+                    email: '{{ student.email }}',
+                    role: '{{ student.role }}'
+                })">
+                    <td>{{ student.username }}</td>
+                   <td><button type="button" class="view-btn">View</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function showStudentInfo(student)
+{
+    document.getElementById('student-info').style.display = 'block';
+    document.getElementById('student-name').innerText = student.username + "'s Profile";
+    document.getElementById('student-email').innerText = student.email;
+    document.getElementById('student-role').innerText = student.role;
+}
+</script>
+{% endblock %}
