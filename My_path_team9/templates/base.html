@@ -553,67 +553,80 @@ body.dark-mode a {
       <ul class="navbar-nav ms-auto">
 
         {% if current_user.is_authenticated %}
-          {% if current_user.role == 'student' %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('student.survey') }}">
-              <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
-              Survey
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('student.dashboard') }}">
-              <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-              Dashboard
-            </a>
-          </li>
-              <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('student.classes') }}">
-              <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-              Your classes
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('student.submit') }}">
-              <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-              Videos
-            </a>
-          </li>
-              <li class="nav-item">
-<a class="nav-link" href="{{ url_for('student.tips') }}">
-<i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
-                Tips
-</a>
-</li>
-          {% endif %}
+  {% if current_user.role == 'student' %}
+    <!-- Student Links -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('student.survey') }}">
+        <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
+        Survey
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('student.dashboard') }}">
+        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+        Dashboard
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('student.classes') }}">
+        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+        Your classes
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('student.submit') }}">
+        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+        Videos
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('student.tips') }}">
+        <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
+        Tips
+      </a>
+    </li>
+  {% elif current_user.role == 'teacher' %}
+    <!-- Teacher Link -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('teacher.dashboard') }}">
+        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+        Teacher Dashboard
+      </a>
+    </li>
+  {% endif %}
 
-          <!-- Profile Dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i data-lucide="user" style="width: 16px; height: 16px;"></i>
-              <span class="ms-1">{{ current_user.username }}</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-              {% if current_user.role == 'student' %}
-              <li><a class="dropdown-item" href="{{ url_for('student.settings') }}">Settings</a></li>
-              {% endif %}
-              <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
-            </ul>
-          </li>
+  <!-- Profile Dropdown (for all roles) -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+      <span class="ms-1">{{ current_user.username }}</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+      {% if current_user.role == 'student' %}
+        <li><a class="dropdown-item" href="{{ url_for('student.settings') }}">Settings</a></li>
+      {% endif %}
+    {% if current_user.role == 'teacher' %}
+        <li><a class="dropdown-item" href="{{ url_for('teacher.settings_teacher') }}">Settings</a></li>
+      {% endif %}
+      <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+    </ul>
+  </li>
+{% else %}
+  <!-- Not logged in -->
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('auth.login') }}">
+      <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+      Login
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('auth.register') }}">
+      <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+      Register
+    </a>
+  </li>
+{% endif %}
 
-        {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.login') }}">
-              <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
-              Login
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.register') }}">
-              <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
-              Register
-            </a>
-          </li>
-        {% endif %}
 
         <!-- Dark mode switch -->
         <li class="nav-item d-flex align-items-center ms-3">

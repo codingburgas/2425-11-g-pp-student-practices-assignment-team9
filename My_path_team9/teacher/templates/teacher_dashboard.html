@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container my-5">
+  <div class="card shadow-sm border-0">
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+      <h4 class="text-center mb-4">Video Submissions</h4>
+        <table class="table table-hover table-bordered align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">👤 Student</th>
+              <th scope="col">🔗 Video Link</th>
+              <th scope="col">📌 Status</th>
+              <th scope="col">⚙️ Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for submission in submissions %}
+            <tr>
+              <td>{{ submission.student.username }}</td>
+              <td>
+                <a href="{{ submission.video_link }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                  View Video
+                </a>
+              </td>
+              <td>
+                {% if submission.confirmed %}
+                  <span class="badge bg-success">Approved</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if not submission.confirmed %}
+                  <a href="{{ url_for('teacher.approve_video', submission_id=submission.id) }}" class="btn btn-sm btn-success">
+                    Approve
+                  </a>
+                  <a href="{{ url_for('teacher.reject_video', submission_id=submission.id) }}" class="btn btn-sm btn-danger">
+                    Reject
+                  </a>
+                {% else %}
+                  <em class="text-muted">Approved</em>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center">Settings</h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <h3 class="text-center mt-4 mb-3">Change Personal Information</h3>
+
+    <div class="mb-3">
+      {{ form.username.label(class="form-label") }}
+      {{ form.username(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.email.label(class="form-label") }}
+      {{ form.email(class="form-control") }}
+    </div>
+
+    <hr>
+
+
+    <div class="mb-3">
+      {{ form.current_password.label(class="form-label") }}
+      {{ form.current_password(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.new_password.label(class="form-label") }}
+      {{ form.new_password(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.confirm_password.label(class="form-label") }}
+      {{ form.confirm_password(class="form-control") }}
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label.text }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
