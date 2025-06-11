@@ -1,6 +1,60 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<style>
+  .table-custom {
+    border-collapse: separate !important;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #f9fbff; /* супер светло синьо */
+    box-shadow: 0 6px 15px rgba(100, 110, 140, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 100%;
+  }
+
+  .table-custom thead tr {
+    background-color: #e6ecff; /* много светло син фон */
+    color: #3b4a6b;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-bottom: none;
+  }
+
+  .table-custom th,
+  .table-custom td {
+    padding: 15px 20px;
+    border-bottom: 3px solid rgba(59, 74, 107, 0.1); /* много светла линия под редовете */
+  }
+
+  .table-custom th:not(:last-child),
+  .table-custom td:not(:last-child) {
+    border-right: 5px solid rgba(59, 74, 107, 0.07); /* супер тънка и светла вертикална линия */
+  }
+
+  .table-custom th:last-child,
+  .table-custom td:last-child {
+    border-right: none;
+  }
+
+  .table-custom tbody tr:hover {
+    background-color: #d4defd; /* нежен син hover */
+    transition: background-color 0.3s ease;
+  }
+
+  /* Бутона стил */
+  .btn-outline-danger {
+    border-color: #d9534f;
+    color: #d9534f;
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #d9534f;
+    color: white;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
   <div class="container py-4">
@@ -56,4 +110,5 @@
   <p>No registered students.</p>
   {% endif %}
 </div>
+  </div>
 {% endblock %}
