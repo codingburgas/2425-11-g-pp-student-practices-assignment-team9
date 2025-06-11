@@ -116,3 +116,20 @@ def students_list():
 
     students = User.query.filter_by(role='student').all()
     return render_template('students.html', students=students)
+
+@teacher_bp.route('/students/delete/<int:user_id>', methods=['POST'])
+@login_required
+def delete_student(user_id):
+    if current_user.role != 'teacher':
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('main.home'))
+
+    student = User.query.get_or_404(user_id)
+    if student.role != 'student':
+        flash('You can only delete student accounts.', 'warning')
+        return redirect(url_for('teacher.students_list'))
+
+    db.session.delete(student)
+    db.session.commit()
+    flash(f'Student {student.email} was successfully deleted.', 'success')
+    return redirect(url_for('teacher.students_list'))
