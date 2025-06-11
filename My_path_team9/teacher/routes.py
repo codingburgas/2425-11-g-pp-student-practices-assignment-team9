@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
-from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash
+from flask_login import login_required, current_user, login_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from .. import db
 from ..auth.models import User
@@ -133,4 +133,21 @@ def delete_student(user_id):
     db.session.commit()
     flash(f'Ученикът {student.email} беше изтрит успешно.', 'success')
     return redirect(url_for('teacher.students_list'))
+
+@teacher_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('main.home'))
+        else:
+            flash('Invalid email or password.', 'danger')
+
+    return render_template('login.html')
+
 
