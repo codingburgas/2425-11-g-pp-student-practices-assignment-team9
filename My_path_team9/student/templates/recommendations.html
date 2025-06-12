@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %}Video Recommendations{% endblock %}
+
+{% block content %}
+<div class="recommendations-page">
+<style>
+    .recommendations-page .recommendations-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .recommendations-page .recommendations-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .recommendations-page .recommendations-header h1 {
+        color: #4285f4;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .recommendations-page .recommendations-header p {
+        color: #666;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .recommendations-page .recommendations-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        border: 1px solid #e8eaed;
+    }
+
+    .recommendations-page .recommendations-title {
+        color: #4285f4;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .recommendations-page .video-item {
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        background: #fafbfc;
+        transition: all 0.3s ease;
+    }
+
+    .recommendations-page .video-item:hover {
+        background: #f1f3f4;
+        border-color: #dadce0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .recommendations-page .video-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .recommendations-page .video-youtube-icon {
+        width: 30px;
+        height: 24px;
+        background: #ff0000;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    .recommendations-page .video-youtube-icon::before {
+        content: "▶";
+        color: white;
+        font-size: 12px;
+    }
+
+    .recommendations-page .video-link {
+        flex: 1;
+        color: #1a73e8;
+        text-decoration: none;
+        font-weight: 500;
+        margin-right: 12px;
+        word-break: break-all;
+    }
+
+    .recommendations-page .video-link:hover {
+        text-decoration: underline;
+    }
+
+    .recommendations-page .video-score {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        background: #e8f5e8;
+        color: #137333;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .recommendations-page .video-reason {
+        margin-top: 8px;
+        color: #5f6368;
+        font-style: italic;
+        font-size: 14px;
+    }
+
+    .recommendations-page .no-recommendations {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 40px 20px;
+    }
+
+    .recommendations-page .back-to-survey {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #1a73e8;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .recommendations-page .back-to-survey:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="recommendations-container">
+    <div class="recommendations-header">
+        <h1>Your Personalized Video Recommendations</h1>
+        <p>Based on your survey responses, we've selected these videos for you</p>
+    </div>
+
+    <div class="recommendations-card">
+        <h3 class="recommendations-title">
+            🎬 Recommended Videos
+        </h3>
+
+        {% if recommendations %}
+            {% for recommendation in recommendations %}
+                <div class="video-item">
+                    <div class="video-header">
+                        <div class="video-youtube-icon"></div>
+                        <a href="{{ recommendation.video.video_link }}" target="_blank" class="video-link">
+                            {{ recommendation.video.video_link }}
+                        </a>
+                        <span class="video-score">
+                            Match: {{ (recommendation.score * 100)|int }}%
+                        </span>
+                    </div>
+                    <div class="video-reason">
+                        {{ recommendation.reason }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-recommendations">
+                No recommendations available. Please complete the survey or try again later.
+            </div>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('student.survey') }}" class="back-to-survey">Take the survey again</a>
+</div>
+</div>
+{% endblock %}

@@ -601,12 +601,18 @@ body.dark-mode a {
 </li>
 
   {% elif current_user.role == 'teacher' %}
+
     <!-- Teacher Link -->
     <li class="nav-item">
       <a class="nav-link" href="{{ url_for('teacher.dashboard') }}">
         <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
         Teacher Dashboard
       </a>
+    </li>
+  {% endif %}
+ {% if current_user.is_authenticated and current_user.role == 'teacher' %}
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('teacher.students_list') }}">Students</a>
     </li>
   {% endif %}
 
