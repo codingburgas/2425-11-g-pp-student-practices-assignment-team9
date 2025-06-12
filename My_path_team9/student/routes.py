@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import login_required, current_user
 from . import student_bp
 from .forms import SurveyForm, SettingsForm
@@ -7,6 +7,9 @@ from ..auth.models import User
 from .models import Survey
 from .forms import VideoSubmissionForm
 from .models import VideoSubmission
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import OneHotEncoder
 
 @student_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -81,7 +84,8 @@ def survey():
         db.session.add(response)
         db.session.commit()
         flash('Thank you for completing the survey.', 'success')
-        return redirect(url_for('student.survey'))
+        # Redirect to recommendations page instead of back to survey
+        return redirect(url_for('student.recommendations', survey_id=response.id))
 
     return render_template('survey.html', form=form, current_user=current_user)
 
@@ -126,3 +130,96 @@ def classes():
 def find_friends():
     all_students = User.query.all()
     return render_template('find_friends.html', students=all_students)
+
+@student_bp.route('/recommendations/<int:survey_id>')
+@login_required
+def recommendations(survey_id):
+    if current_user.role != 'student':
+        return "Access denied", 403
+
+    # Get the survey data
+    survey = Survey.query.get_or_404(survey_id)
+
+    # Get all video submissions
+    all_videos = VideoSubmission.query.filter_by(confirmed=True).all()
+
+    if not all_videos:
+        # If no videos are available, return empty recommendations
+        return render_template('recommendations.html', recommendations=[])
+
+    # Prepare survey data for logistic regression
+    # We'll use key features from the survey that might influence video preferences
+    features = []
+
+    # Convert categorical variables to numerical using one-hot encoding
+    # For simplicity, we'll use a few key features
+
+    # Memory method (direct indicator of preference for videos)
+    memory_method_map = {'notes': 0, 'videos': 1, 'repetition': 0.5}
+    memory_method_value = memory_method_map.get(survey.memory_method, 0)
+
+    # Online learning frequency
+    online_learning_map = {'daily': 1, 'few_times': 0.75, 'rarely': 0.25, 'never': 0}
+    online_learning_value = online_learning_map.get(survey.online_learning, 0)
+
+    # Video helpfulness
+    video_helpful_map = {'very': 1, 'somewhat': 0.7, 'not_much': 0.3, 'not_at_all': 0}
+    video_helpful_value = video_helpful_map.get(survey.video_helpful, 0)
+
+    # Videos for tests
+    videos_for_tests_map = {'always': 1, 'sometimes': 0.7, 'only_if_needed': 0.4, 'never': 0}
+    videos_for_tests_value = videos_for_tests_map.get(survey.videos_for_tests, 0)
+
+    # Combine features
+    X = np.array([
+        memory_method_value,
+        online_learning_value,
+        video_helpful_value,
+        videos_for_tests_value
+    ])
+
+    # Simple logistic regression model
+    # In a real application, this would be trained on historical data
+    # For now, we'll use a simple heuristic approach
+
+    # Calculate a score for each video based on the features
+    recommendations = []
+
+    for video in all_videos:
+        # Calculate a score based on the features
+        # This is a simplified approach - in a real application, you would use a trained model
+        score = (memory_method_value * 0.3 + 
+                online_learning_value * 0.2 + 
+                video_helpful_value * 0.3 + 
+                videos_for_tests_value * 0.2)
+
+        # Normalize score to be between 0 and 1
+        score = min(max(score, 0), 1)
+
+        # Generate a reason for the recommendation
+        reason = "This video matches your learning preferences"
+
+        if memory_method_value > 0.7:
+            reason += " and your preference for video-based learning"
+
+        if video_helpful_value > 0.7:
+            reason += " and aligns with how helpful you find videos"
+
+        if survey.hardest_subject in video.video_link.lower():
+            reason += f" and may help with your challenging subject ({survey.hardest_subject})"
+            score += 0.1  # Boost score for videos matching difficult subjects
+
+        # Add to recommendations
+        recommendations.append({
+            'video': video,
+            'score': min(score, 1.0),  # Cap at 1.0
+            'reason': reason
+        })
+
+    # Sort recommendations by score (highest first)
+    recommendations.sort(key=lambda x: x['score'], reverse=True)
+
+    # Limit to top 5 recommendations
+    recommendations = recommendations[:5]
+
+    return render_template('recommendations.html', recommendations=recommendations)
