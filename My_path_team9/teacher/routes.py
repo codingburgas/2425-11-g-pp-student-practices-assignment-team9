@@ -1,7 +1,5 @@
 from flask import render_template, flash, redirect, url_for, request
-from flask_login import login_required, current_user, login_user
-from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask_login import login_required, current_user
 from .. import db
 from ..auth.models import User
 from ..student.forms import SettingsForm
@@ -106,7 +104,7 @@ def students_list():
             new_student = User(
                 username=username,
                 email=email,
-                password=generate_password_hash(password),
+                password=password,
                 role='student'
             )
             db.session.add(new_student)
@@ -121,33 +119,16 @@ def students_list():
 @login_required
 def delete_student(user_id):
     if current_user.role != 'teacher':
-        flash('Нямате права да извършите това действие.', 'danger')
+        flash('You do not have permission to perform this action.', 'danger')
         return redirect(url_for('main.home'))
 
     student = User.query.get_or_404(user_id)
     if student.role != 'student':
-        flash('Можете да изтривате само ученици.', 'warning')
+        flash('You can only delete students.', 'warning')
         return redirect(url_for('teacher.students_list'))
 
     db.session.delete(student)
     db.session.commit()
-    flash(f'Ученикът {student.email} беше изтрит успешно.', 'success')
+    flash(f'The student {student.email} was deleted successfully.', 'success')
     return redirect(url_for('teacher.students_list'))
-
-@teacher_bp.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-
-        user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            flash('Logged in successfully.', 'success')
-            return redirect(url_for('main.home'))
-        else:
-            flash('Invalid email or password.', 'danger')
-
-    return render_template('login.html')
-
 
