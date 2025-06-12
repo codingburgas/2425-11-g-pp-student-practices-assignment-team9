@@ -70,18 +70,23 @@
       box-shadow: var(--shadow-light);
     }
 
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+.navbar-brand {
+  font-weight: 700;
+  font-size: 2.2rem; /* Increased font size */
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Increased spacing */
+}
+
+.navbar-brand img {
+  width: 80px; /* Adjust the width of the logo */
+  height: 65px; /* Maintain aspect ratio */
+}
 
     .navbar-toggler {
       border: none;
@@ -197,7 +202,33 @@
       font-weight: 700;
       margin-bottom: 1rem;
     }
+    /* Default Light Mode */
+ul, p {
+  color: var(--dark-blue);
+}
 
+li {
+  color: var(--dark-blue);
+}
+
+/* Dark Mode */
+body.dark-mode ul,
+body.dark-mode p,
+body.dark-mode li {
+  color: #7946da; /* Light lavender for readability in dark mode */
+}
+
+    body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  background: linear-gradient(135deg, #d4aaff, #9678e6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
     h1 {
       font-size: 3rem;
       background: var(--gradient-primary);
@@ -411,48 +442,102 @@
       animation: expandWidth 1s ease-out 0.8s both;
     }
       body.dark-mode {
-  background-color: #2a2640; /* по-светъл фон */
-  color: #f5f2ff;
+  background-color: #211d3a; /* Slightly lighter for better contrast */
+  color: #e4e0ff;
 }
 
 body.dark-mode::before {
   background:
-    radial-gradient(circle at 30% 70%, rgba(126, 96, 191, 0.25) 0%, transparent 60%),
-    radial-gradient(circle at 70% 30%, rgba(228, 177, 240, 0.15) 0%, transparent 60%);
+    radial-gradient(circle at 30% 70%, rgba(126, 96, 191, 0.3) 0%, transparent 60%),
+    radial-gradient(circle at 70% 30%, rgba(228, 177, 240, 0.2) 0%, transparent 60%);
 }
 
+/* Cards and Forms */
 body.dark-mode .card,
 body.dark-mode form {
-  background-color: #3b3560;
+  background-color: #322c54;
   color: #f5f5f5;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
+/* Form Inputs */
 body.dark-mode .form-control,
 body.dark-mode .form-select {
-  background-color: #4a456e;
+  background-color: #443c71;
   color: #ffffff;
-  border-color: #777;
+  border-color: #888;
 }
 
+/* Labels */
 body.dark-mode .form-label {
-  color: #e0d4f7;
+  color: #ccbaf4;
 }
 
+/* Buttons */
 body.dark-mode .btn-primary {
-  background: linear-gradient(135deg, #8F87F1, #E9A5F1); /* по-светли и живи */
-  border: none;
+  background: linear-gradient(135deg, #8F87F1, #C49CF3);
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.15);
 }
 
+body.dark-mode .btn-primary:hover {
+  background: linear-gradient(135deg, #7D76E8, #B485F0);
+}
+
+/* Navbar */
 body.dark-mode .navbar {
-  background-color: #3a325c !important;
+  background-color: #2c2548 !important;
+  box-shadow: 0 3px 6px rgba(255, 255, 255, 0.1);
 }
 
+/* Navigation Links */
 body.dark-mode .nav-link {
-  color: #f0cfff !important;
+  color: #e4d0ff !important;
 }
 
+body.dark-mode .nav-link:hover {
+  color: #caa0ff;
+}
+
+/* General Links */
 body.dark-mode a {
-  color: #ffd6ff;
+  color: #f4c1ff;
+}
+
+body.dark-mode a:hover {
+  color: #e59cff;
+}
+
+/* Alerts */
+body.dark-mode .alert {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #e4e0ff;
+}
+
+/* Animations */
+@keyframes darkModeGlow {
+  0%, 100% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.08); }
+  50% { box-shadow: 0 0 16px rgba(255, 255, 255, 0.2); }
+}
+
+body.dark-mode .card:hover,
+body.dark-mode .btn-primary:hover {
+  animation: darkModeGlow 1.5s infinite alternate;
+}
+
+.navbar-brand img.light-mode-logo {
+  display: block;
+}
+
+.navbar-brand img.dark-mode-logo {
+  display: none;
+}
+
+body.dark-mode .navbar-brand img.light-mode-logo {
+  display: none;
+}
+
+body.dark-mode .navbar-brand img.dark-mode-logo {
+  display: block;
 }
 
     /* Animations */
@@ -541,9 +626,10 @@ body.dark-mode a {
 <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand" href="{{ url_for('main.home') }}">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" height="40" class="me-2">
-      My Path
-    </a>
+  <img src="{{ url_for('static', filename='logo.png') }}" alt="Light Logo" class="light-mode-logo">
+  <img src="{{ url_for('static', filename='logo-dark.png') }}" alt="Dark Logo" class="dark-mode-logo">
+</a>
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -680,71 +766,80 @@ body.dark-mode a {
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  // Select the logo element
+  const logo = document.querySelector(".navbar-brand img");
+
+  function toggleDarkMode() {
+    if (!logo) return; // Prevent errors if the logo isn't found
+
+    // Change logo based on dark mode state
+    if (document.body.classList.contains("dark-mode")) {
+      logo.src = "{{ url_for('static', filename='logo-dark.png') }}";
+    } else {
+      logo.src = "{{ url_for('static', filename='logo.png') }}";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const body = document.body;
+    const switchToggle = document.getElementById("darkModeSwitch");
+
+    // Apply saved theme from localStorage
+    if (localStorage.getItem("theme") === "dark") {
+      body.classList.add("dark-mode");
+      toggleDarkMode();
+    }
+
+    // Ensure toggle switch reflects current state
+    if (switchToggle) {
+      switchToggle.checked = body.classList.contains("dark-mode");
+
+      switchToggle.addEventListener("change", function () {
+        body.classList.toggle("dark-mode");
+        localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
+        toggleDarkMode();
+      });
+    }
+  });
+
+  // Additional UI improvements
+  document.addEventListener("DOMContentLoaded", function () {
     lucide.createIcons();
 
-    // --- Hover ефекти върху .card и form ---
-    const cards = document.querySelectorAll('.card, form');
-    cards.forEach(card => {
-      card.addEventListener('mouseenter', function () {
-        this.style.transform = 'translateY(-5px)';
-      });
-      card.addEventListener('mouseleave', function () {
-        this.style.transform = 'translateY(0)';
-      });
+    // Hover effects on .card and form
+    document.querySelectorAll(".card, form").forEach(card => {
+      card.addEventListener("mouseenter", () => card.style.transform = "translateY(-5px)");
+      card.addEventListener("mouseleave", () => card.style.transform = "translateY(0)");
     });
 
-    // --- Submit бутон loading ефект ---
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-      form.addEventListener('submit', function () {
-        const submitBtn = this.querySelector('button[type="submit"]');
+    // Loading animation on form submission
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", function () {
+        const submitBtn = this.querySelector("button[type='submit']");
         if (submitBtn) {
-          submitBtn.classList.add('loading');
+          submitBtn.classList.add("loading");
           submitBtn.disabled = true;
           setTimeout(() => {
-            submitBtn.classList.remove('loading');
+            submitBtn.classList.remove("loading");
             submitBtn.disabled = false;
           }, 3000);
         }
       });
     });
 
-    // --- Focus ефекти на input/select ---
-    const inputs = document.querySelectorAll('.form-control, .form-select');
-    inputs.forEach(input => {
-      input.addEventListener('focus', function () {
-        this.parentElement.style.transform = 'translateY(-2px)';
-        this.parentElement.style.transition = 'transform 0.3s ease';
+    // Input focus effects
+    document.querySelectorAll(".form-control, .form-select").forEach(input => {
+      input.addEventListener("focus", () => {
+        input.parentElement.style.transform = "translateY(-2px)";
+        input.parentElement.style.transition = "transform 0.3s ease";
       });
-      input.addEventListener('blur', function () {
-        this.parentElement.style.transform = 'translateY(0)';
-      });
+      input.addEventListener("blur", () => input.parentElement.style.transform = "translateY(0)");
     });
-
-    // --- Dark mode toggle ---
-    const switchToggle = document.getElementById('darkModeSwitch');
-    const body = document.body;
-
-    if (localStorage.getItem('theme') === 'dark') {
-      body.classList.add('dark-mode');
-      if (switchToggle) switchToggle.checked = true;
-    }
-
-    if (switchToggle) {
-      switchToggle.addEventListener('change', function () {
-        if (this.checked) {
-          body.classList.add('dark-mode');
-          localStorage.setItem('theme', 'dark');
-        } else {
-          body.classList.remove('dark-mode');
-          localStorage.setItem('theme', 'light');
-        }
-      });
-    }
   });
 </script>
+
 {% block scripts %}{% endblock %}
 </body>
 </html>
