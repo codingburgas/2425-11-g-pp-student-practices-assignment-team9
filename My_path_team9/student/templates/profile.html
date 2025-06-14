@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="student-box">
+        <h1 class="text-center mt-4 mb-3">{{ user.username }}'s Profile</h1>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+
+        <h2 class="mt-4">Posts</h2>
+        {% if user.posts %}
+            <div class="grid gap-4">
+                {% for post in user.posts %}
+                    <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-600 rounded-xl p-4 shadow-md">
+                        {% if post.image_url %}
+                            <img src="{{ post.image_url }}" alt="Post image" class="w-full rounded mb-3">
+                        {% endif %}
+
+                        <p>{{ post.content }}</p>
+
+                        {% if post.timestamp %}
+                            <small class="text-gray-500">Posted on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small><br>
+                        {% endif %}
+
+                        <div class="mt-2 flex items-center gap-3">
+                            <form action="{{ url_for('student.like_post', post_id=post.id) }}" method="POST">
+    {% if likes_map[post.id] %}
+        <button type="submit" class="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-600 font-medium rounded-full hover:bg-red-200 transition">
+            ❤️ <span>Unlike</span>
+        </button>
+    {% else %}
+        <button type="submit" class="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-600 font-medium rounded-full hover:bg-gray-200 transition">
+            🤍 <span>Like</span>
+        </button>
+    {% endif %}
+</form>
+
+
+                            <span>{{ post.likes|length }} {{ 'like' if post.likes|length == 1 else 'likes' }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No posts yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
