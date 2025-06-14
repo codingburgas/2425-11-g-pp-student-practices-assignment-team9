@@ -1,47 +1,142 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
+
+<style>
+    .post-container {
+        padding: 2rem;
+    }
+
+    .post-form textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: vertical;
+        font-size: 1rem;
+    }
+
+    .view-btn {
+        padding: 10px 16px;
+        background: linear-gradient(to right, #3b82f6, #2563eb);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .view-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .post-box {
+        background-color: white;
+        padding: 1.25rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        margin-bottom: 1.5rem;
+    }
+
+    .post-image {
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .post-meta {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .post-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 0.75rem;
+    }
+
+    .link-style {
+        color: #2563eb;
+        text-decoration: underline;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .no-posts {
+        color: #6b7280;
+    }
+
+    body.dark-mode .post-box {
+        background-color: rgba(50, 44, 84, 0.9);
+        color: #e4e0ff;
+    }
+
+    body.dark-mode .post-meta {
+        color: #b3add1;
+    }
+
+    body.dark-mode .view-btn {
+        background: linear-gradient(135deg, #8F87F1, #C49CF3);
+    }
+
+    body.dark-mode .view-btn:hover {
+        background: #7D76E8;
+    }
+</style>
+
+<div class="container post-container">
     <div class="student-box">
-        <h1 class="mb-4">My Posts</h1>
+        <h1 class="mb-4" style="font-size: 2.5rem; font-weight: bold; color: #2563eb; text-align: center;">My Posts</h1>
 
         <!-- New Post Form -->
-        <form method="POST">
+        <form method="POST" class="post-form">
             <div class="mb-3">
-                <textarea name="content" rows="4" placeholder="Write something..." style="width: 100%; padding: 10px;" required></textarea>
+                <textarea name="content" rows="4" placeholder="Write something..." required></textarea>
             </div>
-            <button type="submit" class="view-btn">Post</button>
+            <div style="text-align: center;">
+                <button type="submit" class="view-btn">Post</button>
+            </div>
         </form>
 
-        <hr>
-        <h2 class="mt-4">Your Posts</h2>
+        <hr style="margin: 2rem 0;">
+
+        <h2 style="font-size: 1.75rem; font-weight: 600; color: #1e3a8a; margin-bottom: 1rem;">Already posted</h2>
 
         {% if posts %}
-            <div class="grid gap-4">
-                {% for post in posts %}
-                    <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-600 rounded-xl p-4 shadow-md">
-                        {% if post.image_url %}
-                            <img src="{{ post.image_url }}" alt="Post image" class="w-full rounded mb-3">
-                        {% endif %}
+            {% for post in posts %}
+                <div class="post-box">
+                    {% if post.image_url %}
+                        <img src="{{ post.image_url }}" alt="Post image" class="post-image">
+                    {% endif %}
 
-                        <p>{{ post.content }}</p>
+                    <p style="font-size: 1.125rem; font-weight: 500;">{{ post.content }}</p>
 
-                        {% if post.timestamp %}
-                            <small class="text-gray-500">Posted on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small><br>
-                        {% endif %}
-
-                        <div class="mt-2 flex items-center gap-3">
-                            <a href="{{ url_for('student.edit_post', post_id=post.id) }}" class="text-blue-500 hover:underline">Edit</a>
-
-                            <form action="{{ url_for('student.delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="text-red-500 bg-transparent border-none cursor-pointer hover:underline ml-2">Delete</button>
-                            </form>
+                    {% if post.timestamp %}
+                        <div class="post-meta">
+                            Posted on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}
                         </div>
+                    {% endif %}
+
+                    <div class="post-actions">
+                        <!-- Edit Link -->
+                        <a href="{{ url_for('student.edit_post', post_id=post.id) }}" class="link-style">Edit</a>
+
+                        <!-- Delete Link with Hidden Form -->
+                        <a href="#" onclick="event.preventDefault(); this.nextElementSibling.submit();" class="link-style">
+                            Delete
+                        </a>
+                        <form action="{{ url_for('student.delete_post', post_id=post.id) }}" method="POST" style="display: none;"></form>
                     </div>
-                {% endfor %}
-            </div>
+                </div>
+            {% endfor %}
         {% else %}
-            <p>You haven't posted anything yet.</p>
+            <p class="no-posts">You haven't posted anything yet.</p>
         {% endif %}
     </div>
 </div>
+
 {% endblock %}
