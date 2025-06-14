@@ -1,10 +1,10 @@
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import render_template, flash, redirect, url_for, request, session, abort
 from flask_login import login_required, current_user
 from . import student_bp
 from .forms import SurveyForm, SettingsForm
 from .. import db
 from ..auth.models import User
-from .models import Survey
+from .models import Survey, Post, Like
 from .forms import VideoSubmissionForm
 from .models import VideoSubmission
 import numpy as np
@@ -130,6 +130,82 @@ def classes():
 def find_friends():
     all_students = User.query.all()
     return render_template('find_friends.html', students=all_students)
+
+@student_bp.route('/profile/<int:user_id>')
+@login_required
+def profile(user_id):
+    user = User.query.get_or_404(user_id)
+
+    # Map: post.id -> whether the current user liked it
+    likes_map = {post.id: any(like.user_id == current_user.id for like in post.likes) for post in user.posts}
+
+    return render_template('profile.html', user=user, likes_map=likes_map)
+
+
+@student_bp.route('/my_posts', methods=['GET', 'POST'])
+@login_required
+def my_posts():
+    if request.method == 'POST':
+        content = request.form.get('content')
+        if not content.strip():
+            flash("Post content can't be empty.", "warning")
+        else:
+            new_post = Post(content=content, user_id=current_user.id)
+            db.session.add(new_post)
+            db.session.commit()
+            flash("Post added successfully!", "success")
+            return redirect(url_for('student.my_posts'))
+
+    posts = Post.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_posts.html', posts=posts)
+
+@student_bp.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.user_id != current_user.id:
+        abort(403)
+
+    if request.method == 'POST':
+        content = request.form.get('content')
+        post.content = content
+        db.session.commit()
+        flash("Post updated!", "success")
+        return redirect(url_for('student.my_posts'))
+
+    return render_template('edit_post.html', post=post)
+
+
+@student_bp.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.user_id != current_user.id:
+        abort(403)
+
+    db.session.delete(post)
+    db.session.commit()
+    flash("Post deleted.", "info")
+    return redirect(url_for('student.my_posts'))
+
+
+@student_bp.route('/like/<int:post_id>', methods=['POST'])
+@login_required
+def like_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    existing_like = Like.query.filter_by(user_id=current_user.id, post_id=post.id).first()
+
+    if existing_like:
+        # Already liked — remove like
+        db.session.delete(existing_like)
+    else:
+        # Not liked yet — add like
+        like = Like(user_id=current_user.id, post_id=post.id)
+        db.session.add(like)
+
+    db.session.commit()
+    return redirect(request.referrer or url_for('student.profile'))
+
 
 @student_bp.route('/recommendations/<int:survey_id>')
 @login_required
