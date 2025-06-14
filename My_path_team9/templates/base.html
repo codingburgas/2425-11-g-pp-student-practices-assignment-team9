@@ -716,6 +716,7 @@ body.dark-mode .navbar-brand img.dark-mode-logo {
         <li><a class="dropdown-item" href="{{ url_for('teacher.settings_teacher') }}">Settings</a></li>
       {% endif %}
       <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('student.my_posts') }}">My posts</a></li>
     </ul>
   </li>
 {% else %}
