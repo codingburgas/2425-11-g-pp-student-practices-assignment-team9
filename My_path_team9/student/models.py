@@ -6,6 +6,9 @@ class Survey(db.Model):
     __tablename__ = 'survey'
     id = db.Column(db.Integer, primary_key=True)
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', backref='surveys')
+
     class_section = db.Column(db.String(10), nullable=False)
     study_time = db.Column(db.String(20), nullable=False)
     interest_level = db.Column(db.String(20), nullable=False)
