@@ -271,7 +271,11 @@ def recommendations(survey_id):
 
         # Normalize score to be between 0 and 1
         score = min(max(score, 0), 1)
-
+        subject_bonus = 0.1 if survey.hardest_subject.lower() in video.video_link.lower() else 0
+        # Add slight variation based on video ID to avoid identical scores
+        unique_offset = (video.id % 10) * 0.005  # max +0.045
+        # Final score capped at 1.0
+        score = min(score + subject_bonus + unique_offset, 1.0)
         # Generate a reason for the recommendation
         reason = "This video matches your learning preferences"
 
