@@ -65,6 +65,7 @@ def survey():
         lesson_quality = ','.join(form.lesson_quality.data) if form.lesson_quality.data else ''
 
         response = Survey(
+            user_id=current_user.id,
             class_section=form.class_section.data,
             study_time=form.study_time.data,
             interest_level=form.interest_level.data,
@@ -206,7 +207,6 @@ def like_post(post_id):
     db.session.commit()
     return redirect(request.referrer or url_for('student.profile'))
 
-
 @student_bp.route('/recommendations/<int:survey_id>')
 @login_required
 def recommendations(survey_id):
@@ -264,9 +264,9 @@ def recommendations(survey_id):
     for video in all_videos:
         # Calculate a score based on the features
         # This is a simplified approach - in a real application, you would use a trained model
-        score = (memory_method_value * 0.3 + 
-                online_learning_value * 0.2 + 
-                video_helpful_value * 0.3 + 
+        score = (memory_method_value * 0.3 +
+                online_learning_value * 0.2 +
+                video_helpful_value * 0.3 +
                 videos_for_tests_value * 0.2)
 
         # Normalize score to be between 0 and 1
