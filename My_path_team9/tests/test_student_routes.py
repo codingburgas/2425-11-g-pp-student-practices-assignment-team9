@@ -41,7 +41,7 @@ def test_settings_requires_login(client):
 
 def test_submit_video(client, app):
     login_as_student(client, app)
-    response = client.post('/submit', data={'video_link': 'https://youtube.com/example'}, follow_redirects=True)
+    response = client.post('/student/submit', data={'video_link': 'https://youtube.com/example'}, follow_redirects=True)
     assert b"Video submitted successfully" in response.data
 
 def test_survey_submission(client, app):
