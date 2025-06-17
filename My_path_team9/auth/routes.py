@@ -4,6 +4,7 @@ from . import auth_bp
 from .forms import LoginForm, RegisterForm
 from .models import User
 from .. import login_manager, db
+login_manager.login_view = 'auth.login'
 
 
 @login_manager.user_loader

@@ -14,7 +14,7 @@ from sklearn.preprocessing import OneHotEncoder
 @student_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
-    if current_user.role != 'student':
+    if not current_user.is_authenticated or current_user.role != 'student':
         return "Access denied", 403
 
     form = SettingsForm(obj=current_user)

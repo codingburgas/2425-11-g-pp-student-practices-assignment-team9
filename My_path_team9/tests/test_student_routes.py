@@ -36,7 +36,7 @@ def test_dashboard_access(client, app):
         assert response.status_code == 200
 
 def test_settings_requires_login(client):
-    response = client.get('/settings')
+    response = client.get('/student/settings', follow_redirects=False)
     assert response.status_code == 302  # Redirect to login
 
 def test_submit_video(client, app):
