@@ -4,16 +4,30 @@ from . import auth_bp
 from .forms import LoginForm, RegisterForm
 from .models import User
 from .. import login_manager, db
-login_manager.login_view = 'auth.login'
 
+# Set the login view for the login manager
+login_manager.login_view = 'auth.login'
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    Loads a user from the database by ID for Flask-Login.
+    Args:
+        user_id (str): The ID of the user to load.
+    Returns:
+        User: The user object if found, otherwise None.
+    """
     return User.query.get(int(user_id))
-
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handles user login requests. Renders the login form and processes form submissions.
+
+    Returns:
+        Response: A redirect to the appropriate dashboard if login is successful,
+                  or a re-rendered login page with an error message on failure.
+    """
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -36,6 +50,12 @@ def login():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Handles user registration requests. Renders the registration form and processes user data.
+
+    Returns:
+        Response: Redirects to login on success or re-renders the form with messages on failure.
+    """
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -68,9 +88,16 @@ def register():
 
     return render_template("register.html", form=form, current_user=current_user)
 
+
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    """
+    Logs the current user out and redirects to the home page.
+
+    Returns:
+        Response: A redirect to the main home page after logging out.
+    """
     logout_user()
     print('Logged out successfully.')
     return redirect(url_for("main.home"))

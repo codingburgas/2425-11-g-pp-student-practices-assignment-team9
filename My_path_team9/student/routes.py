@@ -8,12 +8,17 @@ from .models import Survey, Post, Like
 from .forms import VideoSubmissionForm
 from .models import VideoSubmission
 import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import OneHotEncoder
+
 
 @student_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
+    """
+        Allows students to update their profile settings including username, email, and password.
+
+        Returns:
+            Renders the settings form or redirects with success/error messages.
+        """
     if not current_user.is_authenticated or current_user.role != 'student':
         return "Access denied", 403
 
@@ -55,6 +60,12 @@ def settings():
 @student_bp.route('/survey', methods=['GET', 'POST'])
 @login_required
 def survey():
+    """
+        Allows students to submit a learning preference and study habits survey.
+
+        Returns:
+            Renders the survey form or redirects to the recommendation page.
+        """
     if current_user.role != 'student':
         return "Access denied", 403
 
@@ -93,12 +104,24 @@ def survey():
 @student_bp.route('/dashboard')
 @login_required
 def dashboard():
+    """
+        Renders the student dashboard.
+
+        Returns:
+            The student dashboard page.
+        """
     return render_template('student_dashboard.html')
 
 
 @student_bp.route('/submit', methods=['GET', 'POST'])
 @login_required
 def submit():
+    """
+        Allows students to submit educational video links.
+
+        Returns:
+            Renders the submission form or refreshes the page with submission list.
+        """
     if current_user.role != 'student':
         return "Access denied", 403
 
@@ -120,21 +143,48 @@ def submit():
 @student_bp.route('/tips')
 @login_required
 def tips():
+    """
+        Displays academic tips for students.
+
+        Returns:
+            Tips HTML page.
+        """
     return render_template('tips.html')
 
 @student_bp.route('/classes')
 @login_required
 def classes():
+    """
+      Displays available classes to students.
+
+      Returns:
+          Classes HTML page.
+      """
     return render_template('classes.html')
 
 @student_bp.route('/find_friends')
 def find_friends():
+    """
+        Displays all student profiles for social interaction.
+
+        Returns:
+            Find friends page with a list of students.
+        """
     all_students = User.query.all()
     return render_template('find_friends.html', students=all_students)
 
 @student_bp.route('/profile/<int:user_id>')
 @login_required
 def profile(user_id):
+    """
+        Displays a specific user's profile including their posts and like status.
+
+        Args:
+            user_id (int): The ID of the user to view.
+
+        Returns:
+            Profile page for the selected user.
+        """
     user = User.query.get_or_404(user_id)
 
     # Map: post.id -> whether the current user liked it
@@ -146,6 +196,12 @@ def profile(user_id):
 @student_bp.route('/my_posts', methods=['GET', 'POST'])
 @login_required
 def my_posts():
+    """
+        Allows students to view and add their own posts.
+
+        Returns:
+            The user's posts page or refresh after adding a new post.
+        """
     if request.method == 'POST':
         content = request.form.get('content')
         if not content.strip():
@@ -163,6 +219,15 @@ def my_posts():
 @student_bp.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def edit_post(post_id):
+    """
+        Allows students to edit their existing post.
+
+        Args:
+            post_id (int): The ID of the post to edit.
+
+        Returns:
+            Post editing page or redirect after update.
+        """
     post = Post.query.get_or_404(post_id)
     if post.user_id != current_user.id:
         abort(403)
@@ -180,6 +245,15 @@ def edit_post(post_id):
 @student_bp.route('/delete_post/<int:post_id>', methods=['POST'])
 @login_required
 def delete_post(post_id):
+    """
+       Deletes a student's post.
+
+       Args:
+           post_id (int): The ID of the post to delete.
+
+       Returns:
+           Redirect to the posts page after deletion.
+       """
     post = Post.query.get_or_404(post_id)
     if post.user_id != current_user.id:
         abort(403)
@@ -193,6 +267,15 @@ def delete_post(post_id):
 @student_bp.route('/like/<int:post_id>', methods=['POST'])
 @login_required
 def like_post(post_id):
+    """
+       Toggles like status on a post for the current user.
+
+       Args:
+           post_id (int): The ID of the post to like/unlike.
+
+       Returns:
+           Redirects to the referring page or student profile.
+       """
     post = Post.query.get_or_404(post_id)
     existing_like = Like.query.filter_by(user_id=current_user.id, post_id=post.id).first()
 
@@ -210,6 +293,15 @@ def like_post(post_id):
 @student_bp.route('/recommendations/<int:survey_id>')
 @login_required
 def recommendations(survey_id):
+    """
+        Recommends videos to students based on their survey data using a heuristic model.
+
+        Args:
+            survey_id (int): The ID of the submitted survey.
+
+        Returns:
+            Renders a recommendation page with up to 5 recommended videos.
+        """
     if current_user.role != 'student':
         return "Access denied", 403
 
