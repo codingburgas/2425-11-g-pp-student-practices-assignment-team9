@@ -1,10 +1,31 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
+
+from .models import MotivationalVideo
 from .. import db
 from ..auth.models import User
 from ..student.forms import SettingsForm
 from ..student.models import VideoSubmission
 from . import teacher_bp
+
+@teacher_bp.route('/send_video', methods=['GET', 'POST'])
+@login_required
+def send_video():
+    if current_user.role != 'teacher':
+        return "Access denied", 403
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        link = request.form.get('link')
+        if title:
+            new_video = MotivationalVideo(title=title, video_link=link)
+            db.session.add(new_video)
+            db.session.commit()
+            flash('Video sent successfully!', 'success')
+            return redirect(url_for('teacher.send_video'))
+        flash('Title is required', 'danger')
+    return render_template('send_video.html')
+
 
 @teacher_bp.route('/dashboard')
 @login_required
