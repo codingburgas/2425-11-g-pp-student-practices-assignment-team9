@@ -49,7 +49,8 @@
 
     .recommendations-page .video-item {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
         padding: 16px;
         border: 1px solid #e8eaed;
         border-radius: 8px;
@@ -63,6 +64,22 @@
         border-color: #dadce0;
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .recommendations-page .video-thumbnail {
+        width: 120px;
+        height: 90px;
+        border-radius: 8px;
+        margin-right: 18px;
+        object-fit: cover;
+        background: #eee;
+        flex-shrink: 0;
+    }
+
+    .recommendations-page .video-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     .recommendations-page .video-header {
@@ -158,8 +175,16 @@
 
     @media (max-width: 600px) {
         .recommendations-page .video-item {
+            flex-direction: column;
+            align-items: flex-start;
             padding: 12px;
             font-size: 14px;
+        }
+
+        .recommendations-page .video-thumbnail {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
         }
 
         .recommendations-page .video-score {
@@ -182,24 +207,36 @@
 
         {% if recommendations %}
             {% for recommendation in recommendations %}
-                {% set video_id = recommendation.video.video_link.split('v=')[-1] %}
-                {% set score = recommendation.score %}
+                {% set video_url = recommendation.video.video_link %}
+                {% if 'youtu.be/' in video_url %}
+                    {% set video_id = video_url.split('youtu.be/')[-1].split('?')[0] %}
+                {% elif 'watch?v=' in video_url %}
+                    {% set video_id = video_url.split('watch?v=')[-1].split('&')[0] %}
+                {% else %}
+                    {% set video_id = video_url %}
+                {% endif %}
                 <div class="video-item">
-                    <div class="video-header">
-                        <div class="video-youtube-icon"></div>
-                        <a href="{{ recommendation.video.video_link }}" target="_blank" class="video-link">
-                            youtube.com/watch?v={{ video_id }}
-                        </a>
-                        <span class="video-score
-                            {% if score >= 0.8 %}high
-                            {% elif score >= 0.5 %}medium
-                            {% else %}low
-                            {% endif %}">
-                            Match: {{ (score * 100)|int }}%
-                        </span>
-                    </div>
-                    <div class="video-reason">
-                        {{ recommendation.reason }}
+                    <img class="video-thumbnail" src="https://img.youtube.com/vi/{{ video_id }}/0.jpg" alt="Thumbnail">
+                    <div class="video-details">
+                        <div class="video-header">
+                            <div class="video-youtube-icon"></div>
+                            {% if recommendation.video.title %}
+                                <div><strong>{{ recommendation.video.title }}</strong></div>
+                            {% endif %}
+                            <a href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank" class="video-link">
+                                youtube.com/watch?v={{ video_id }}
+                            </a>
+                            <span class="video-score
+                                {% if recommendation.score >= 0.8 %}high
+                                {% elif recommendation.score >= 0.5 %}medium
+                                {% else %}low
+                                {% endif %}">
+                                Match: {{ (recommendation.score * 100)|int }}%
+                            </span>
+                        </div>
+                        <div class="video-reason">
+                            {{ recommendation.reason }}
+                        </div>
                     </div>
                 </div>
             {% endfor %}

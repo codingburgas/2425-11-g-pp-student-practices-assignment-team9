@@ -10,7 +10,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 class SurveyForm(FlaskForm):
     class_section = RadioField('Which class and section are you in?', choices=[
-        ('9A', '9A'), ('9B', '9B'), ('9C', '9V'), ('9D', '9G')
+        ('9A', '9A'), ('9B', '9B'), ('9C', '9C'), ('9G', '9G')
     ])
 
     study_time = RadioField('How many hours a day do you study outside school?', choices=[
@@ -34,7 +34,7 @@ class SurveyForm(FlaskForm):
         ('stressed', 'Stressed')
     ])
 
-    memory_method = RadioField('What’s your easiest way to remember information?', choices=[
+    memory_method = RadioField("What's your easiest way to remember information?", choices=[
         ('notes', 'Taking notes'),
         ('videos', 'Watching videos'),
         ('repetition', 'Repeating information')
@@ -94,13 +94,13 @@ class SurveyForm(FlaskForm):
         ('under_5', 'Less than 5 minutes'),
         ('5_10', '5–10 minutes'),
         ('10_20', '10–20 minutes'),
-        ('doesnt_matter', 'Doesn’t matter as long as it’s useful')
+        ('doesnt_matter', 'Does not matter as long as it is useful')
     ])
 
     videos_for_tests = RadioField('Do you watch video lessons when preparing for tests?', choices=[
         ('always', 'Always'),
         ('sometimes', 'Sometimes'),
-        ('only_if_needed', 'Only if I don’t understand'),
+        ('only_if_needed', 'Only if I do not understand'),
         ('never', 'Never')
     ])
 

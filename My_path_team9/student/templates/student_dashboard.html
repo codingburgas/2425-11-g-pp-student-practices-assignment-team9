@@ -47,7 +47,7 @@
   h1 {
     font-size: 3.5rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #2563eb, #1a73e8);
+    background: linear-gradient(135deg, #1a73e8, #1a73e8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -334,6 +334,46 @@
     <h1 class="mb-3">Welcome, {{ current_user.username }}!</h1>
     <p class="text-muted">Your student dashboard — here are your motivational videos:</p>
   </div>
+
+  {# --- AI-Recommended Videos Section --- #}
+  {% if recommended_videos %}
+    <hr class="my-4">
+    <h2 class="h4 mb-3">🤖 AI-Recommended Videos For You</h2>
+    <div class="videos-grid">
+      {% for rec in recommended_videos %}
+        <div class="video-card">
+          <div>
+            <div class="video-header">
+              <div class="video-icon">🎬</div>
+              <div>
+                {% if rec.video.title %}
+                  <h3 class="video-title">{{ rec.video.title }}</h3>
+                {% endif %}
+              </div>
+            </div>
+            {% set video_url = rec.video.video_link %}
+            {% if 'youtu.be/' in video_url %}
+              {% set video_id = video_url.split('youtu.be/')[-1].split('?')[0] %}
+            {% elif 'watch?v=' in video_url %}
+              {% set video_id = video_url.split('watch?v=')[-1].split('&')[0] %}
+            {% else %}
+              {% set video_id = video_url %}
+            {% endif %}
+            <img class="video-thumbnail" src="https://img.youtube.com/vi/{{ video_id }}/0.jpg" alt="Thumbnail" style="width:120px; border-radius:8px; margin-bottom:10px;">
+            <a href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank" rel="noopener noreferrer" class="btn-watch">
+              ▶️ Watch Now
+            </a>
+            <div class="video-reason" style="margin-top:10px; color:#1a73e8;">
+              {{ rec.reason }}
+            </div>
+            <span class="video-score" style="margin-top:8px; display:inline-block;">
+              Match: {{ (rec.score * 100)|int }}%
+            </span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <hr class="my-4">
   <h2 class="h4 mb-3">🎥 Motivational Videos</h2>

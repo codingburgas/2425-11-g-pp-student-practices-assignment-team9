@@ -7,7 +7,7 @@ from ..auth.models import User
 from .models import Survey, Post, Like
 from .forms import VideoSubmissionForm
 from .models import VideoSubmission
-import numpy as np
+from .ai_recommender import recommender
 
 
 @student_bp.route('/settings', methods=['GET', 'POST'])
@@ -107,21 +107,35 @@ def dashboard():
     if current_user.role != 'student':
         return "Access denied", 403
 
+    # Motivational videos (existing logic)
     videos = MotivationalVideo.query.all()
-
     video_data = []
     for video in videos:
         ratings = [r.rating for r in video.ratings]
         avg_rating = round(sum(ratings) / len(ratings), 1) if ratings else None
         my_rating = next((r.rating for r in video.ratings if r.student_id == current_user.id), None)
-
         video_data.append({
             'video': video,
             'average_rating': avg_rating,
             'my_rating': my_rating
         })
 
-    return render_template('student_dashboard.html', videos=video_data)
+    # --- NEW: Get recommendations for the current student ---
+    # Get the latest survey for the current user
+    survey = Survey.query.filter_by(user_id=current_user.id).order_by(Survey.id.desc()).first()
+    recommended_videos = []
+    if survey:
+        # Get all available videos (submitted + motivational)
+        submitted_videos = VideoSubmission.query.all()
+        motivational_videos = MotivationalVideo.query.all()
+        all_videos = list(submitted_videos) + list(motivational_videos)
+        recommended_videos = recommender.get_recommendations(survey, all_videos, top_k=5)
+
+    return render_template(
+        'student_dashboard.html',
+        videos=video_data,
+        recommended_videos=recommended_videos
+    )
 
 @student_bp.route('/submit', methods=['GET', 'POST'])
 @login_required
@@ -304,107 +318,56 @@ def like_post(post_id):
 @login_required
 def recommendations(survey_id):
     """
-        Recommends videos to students based on their survey data using a heuristic model.
+        Recommends videos to students based on their survey data using logistic regression AI.
 
         Args:
             survey_id (int): The ID of the submitted survey.
 
         Returns:
             Renders a recommendation page with up to 5 recommended videos.
-        """
+    """
     if current_user.role != 'student':
         return "Access denied", 403
 
     # Get the survey data
     survey = Survey.query.get_or_404(survey_id)
+    
+    # Verify the survey belongs to the current user
+    if survey.user_id != current_user.id:
+        abort(403)
 
-    # Get all video submissions
-    all_videos = VideoSubmission.query.filter_by(confirmed=True).all()
+    # Get all available videos (both submitted and motivational)
+    submitted_videos = VideoSubmission.query.all()
+    motivational_videos = MotivationalVideo.query.all()
+    
+    # Combine all videos
+    all_videos = list(submitted_videos) + list(motivational_videos)
 
     if not all_videos:
         # If no videos are available, return empty recommendations
-        return render_template('recommendations.html', recommendations=[])
+        return render_template('recommendations.html', recommendations=[], survey=survey)
 
-    # Prepare survey data for logistic regression
-    # We'll use key features from the survey that might influence video preferences
-    features = []
+    # Train the model if it hasn't been trained yet
+    if recommender.model is None:
+        print("Training AI recommendation model...")
+        success = recommender.train_model()
+        if not success:
+            print("Failed to train model, using fallback method")
+    
+    # Get AI-powered recommendations
+    recommendations = recommender.get_recommendations(survey, all_videos, top_k=5)
+    
+    # Add model information for transparency
+    model_info = {
+        'model_type': 'Logistic Regression',
+        'features_used': len(recommender.feature_names),
+        'is_trained': recommender.model is not None
+    }
 
-    # Convert categorical variables to numerical using one-hot encoding
-    # For simplicity, we'll use a few key features
-
-    # Memory method (direct indicator of preference for videos)
-    memory_method_map = {'notes': 0, 'videos': 1, 'repetition': 0.5}
-    memory_method_value = memory_method_map.get(survey.memory_method, 0)
-
-    # Online learning frequency
-    online_learning_map = {'daily': 1, 'few_times': 0.75, 'rarely': 0.25, 'never': 0}
-    online_learning_value = online_learning_map.get(survey.online_learning, 0)
-
-    # Video helpfulness
-    video_helpful_map = {'very': 1, 'somewhat': 0.7, 'not_much': 0.3, 'not_at_all': 0}
-    video_helpful_value = video_helpful_map.get(survey.video_helpful, 0)
-
-    # Videos for tests
-    videos_for_tests_map = {'always': 1, 'sometimes': 0.7, 'only_if_needed': 0.4, 'never': 0}
-    videos_for_tests_value = videos_for_tests_map.get(survey.videos_for_tests, 0)
-
-    # Combine features
-    X = np.array([
-        memory_method_value,
-        online_learning_value,
-        video_helpful_value,
-        videos_for_tests_value
-    ])
-
-    # Simple logistic regression model
-    # In a real application, this would be trained on historical data
-    # For now, we'll use a simple heuristic approach
-
-    # Calculate a score for each video based on the features
-    recommendations = []
-
-    for video in all_videos:
-        # Calculate a score based on the features
-        # This is a simplified approach - in a real application, you would use a trained model
-        score = (memory_method_value * 0.3 +
-                online_learning_value * 0.2 +
-                video_helpful_value * 0.3 +
-                videos_for_tests_value * 0.2)
-
-        # Normalize score to be between 0 and 1
-        score = min(max(score, 0), 1)
-        subject_bonus = 0.1 if survey.hardest_subject.lower() in video.video_link.lower() else 0
-        # Add slight variation based on video ID to avoid identical scores
-        unique_offset = (video.id % 10) * 0.005  # max +0.045
-        # Final score capped at 1.0
-        score = min(score + subject_bonus + unique_offset, 1.0)
-        # Generate a reason for the recommendation
-        reason = "This video matches your learning preferences"
-
-        if memory_method_value > 0.7:
-            reason += " and your preference for video-based learning"
-
-        if video_helpful_value > 0.7:
-            reason += " and aligns with how helpful you find videos"
-
-        if survey.hardest_subject in video.video_link.lower():
-            reason += f" and may help with your challenging subject ({survey.hardest_subject})"
-            score += 0.1  # Boost score for videos matching difficult subjects
-
-        # Add to recommendations
-        recommendations.append({
-            'video': video,
-            'score': min(score, 1.0),  # Cap at 1.0
-            'reason': reason
-        })
-
-    # Sort recommendations by score (highest first)
-    recommendations.sort(key=lambda x: x['score'], reverse=True)
-
-    # Limit to top 5 recommendations
-    recommendations = recommendations[:5]
-
-    return render_template('recommendations.html', recommendations=recommendations)
+    return render_template('recommendations.html', 
+                         recommendations=recommendations, 
+                         survey=survey,
+                         model_info=model_info)
 
 
 from ..teacher.models import MotivationalVideo, VideoRating
