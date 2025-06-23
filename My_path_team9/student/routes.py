@@ -104,14 +104,24 @@ def survey():
 @student_bp.route('/dashboard')
 @login_required
 def dashboard():
-    """
-        Renders the student dashboard.
+    if current_user.role != 'student':
+        return "Access denied", 403
 
-        Returns:
-            The student dashboard page.
-        """
-    return render_template('student_dashboard.html')
+    videos = MotivationalVideo.query.all()
 
+    video_data = []
+    for video in videos:
+        ratings = [r.rating for r in video.ratings]
+        avg_rating = round(sum(ratings) / len(ratings), 1) if ratings else None
+        my_rating = next((r.rating for r in video.ratings if r.student_id == current_user.id), None)
+
+        video_data.append({
+            'video': video,
+            'average_rating': avg_rating,
+            'my_rating': my_rating
+        })
+
+    return render_template('student_dashboard.html', videos=video_data)
 
 @student_bp.route('/submit', methods=['GET', 'POST'])
 @login_required
@@ -395,3 +405,46 @@ def recommendations(survey_id):
     recommendations = recommendations[:5]
 
     return render_template('recommendations.html', recommendations=recommendations)
+
+
+from ..teacher.models import MotivationalVideo, VideoRating
+
+@student_bp.route('/rate_video', methods=['POST'])
+@login_required
+def rate_video():
+    if current_user.role != 'student':
+        return "Access denied", 403
+
+    video_id = request.form.get('video_id')
+    rating_str = request.form.get('rating')
+
+    # Validate video_id and rating presence
+    if not video_id or not rating_str:
+        flash('Video ID and rating are required.', 'danger')
+        return redirect(url_for('student.dashboard'))
+
+    try:
+        video_id = int(video_id)
+        rating = int(rating_str)
+    except ValueError:
+        flash('Invalid video ID or rating.', 'danger')
+        return redirect(url_for('student.dashboard'))
+
+    # Check if the video exists to avoid FK violation
+    video = MotivationalVideo.query.get(video_id)
+    if not video:
+        flash('Video not found.', 'danger')
+        return redirect(url_for('student.dashboard'))
+
+    # Check for existing rating and update or create new
+    existing = VideoRating.query.filter_by(student_id=current_user.id, video_id=video_id).first()
+    if existing:
+        existing.rating = rating
+    else:
+        new_rating = VideoRating(student_id=current_user.id, video_id=video_id, rating=rating)
+        db.session.add(new_rating)
+
+    db.session.commit()
+    flash('Your rating was saved!', 'success')
+    return redirect(url_for('student.dashboard'))
+

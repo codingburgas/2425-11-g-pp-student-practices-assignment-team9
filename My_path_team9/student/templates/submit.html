@@ -227,7 +227,7 @@
             <div class="video-form-group">
 <label class="video-form-label" for="{{ form.video_link.id }}">Video Link</label>
 <div class="video-input-icon">
-                    {{ form.video_link(class="video-form-input", placeholder="Paste your YouTube, Vimeo, or other video URL here...") }}
+                    {{ form.video_link(class="video-form-input", placeholder="Paste your YouTube or other video URL here...") }}
 </div>
                 {% for error in form.video_link.errors %}
 <span class="video-error-message">{{ error }}</span>

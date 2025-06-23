@@ -1,6 +1,193 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<style>
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-weight: 700;
+    color: #4f46e5;
+  }
+
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .video-card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.3s ease;
+  }
+  .video-card:hover {
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.2);
+  }
+
+  .video-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4f46e5;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-watch {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  .btn-watch:hover {
+    background: linear-gradient(135deg, #4338ca, #6b21a8);
+  }
+
+  .rating-stars {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  .star {
+    color: #fbbf24;
+  }
+  .star.empty {
+    color: #e5e7eb;
+  }
+
+  .rating-info {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  form.rate-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  select.form-select-sm {
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+  }
+
+  button.btn-rate {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button.btn-rate:hover {
+    background-color: #059669;
+  }
+
+  @media (max-width: 600px) {
+    .videos-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Welcome, {{ current_user.username }}!</h1>
-<p>This is your student dashboard.</p>
+<div class="container mt-4">
+
+  <h1 class="mb-3">Welcome, {{ current_user.username }}!</h1>
+  <p class="text-muted">Your student dashboard — here are your motivational videos:</p>
+
+  <hr class="my-4">
+  <h2 class="h4 mb-3">Motivational Videos</h2>
+
+  {% if videos %}
+    <div class="videos-grid">
+      {% for video in videos %}
+        <div class="video-card">
+          <div>
+            <h3 class="video-title">{{ video.video.title }}</h3>
+
+            {% if video.video.video_link %}
+              <a href="{{ video.video.video_link }}" target="_blank" rel="noopener noreferrer" class="btn-watch">▶️ Watch</a>
+            {% else %}
+              <span class="rating-info">Video link not available</span>
+            {% endif %}
+
+            <div><strong>Your Rating:</strong>
+              {% if video.my_rating %}
+                {% for i in range(1, 6) %}
+                  {% if i <= video.my_rating %}
+                    <span style="color:#fbbf24; font-size:1.2rem;">★</span>
+                  {% else %}
+                    <span style="color:#e5e7eb; font-size:1.2rem;">★</span>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <span>Not rated yet</span>
+              {% endif %}
+            </div>
+
+            <div>
+              <strong>Average Rating:</strong>
+              {% if video.average_rating %}
+                {% set avg = video.average_rating %}
+                <span class="rating-stars" aria-label="Average rating: {{ "%.1f"|format(avg) }} out of 5 stars">
+                  {% for i in range(1, 6) %}
+                    {% if i <= avg %}
+                      <span class="star" aria-hidden="true">★</span>
+                    {% elif i - avg < 1 %}
+                      <span class="star" aria-hidden="true">★</span>
+                    {% else %}
+                      <span class="star empty" aria-hidden="true">★</span>
+                    {% endif %}
+                  {% endfor %}
+                </span>
+                <span class="rating-info">({{ "%.1f"|format(avg) }})</span>
+              {% else %}
+                <span class="rating-info">No ratings yet</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <form method="POST" action="{{ url_for('student.rate_video') }}" class="rate-form mt-3">
+            <input type="hidden" name="video_id" value="{{ video.video.id }}">
+            <select name="rating" class="form-select-sm" required>
+              <option value="" disabled selected>Rate</option>
+              {% for num in range(1, 6) %}
+                <option value="{{ num }}">{{ num }} ⭐</option>
+              {% endfor %}
+            </select>
+            <button class="btn-rate" type="submit">Rate</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No videos have been uploaded yet.</p>
+  {% endif %}
+
+</div>
 {% endblock %}

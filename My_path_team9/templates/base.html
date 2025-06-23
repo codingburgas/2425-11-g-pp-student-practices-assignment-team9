@@ -701,6 +701,11 @@ body.dark-mode .navbar-brand img.dark-mode-logo {
       <a class="nav-link" href="{{ url_for('teacher.students_list') }}">Students</a>
     </li>
   {% endif %}
+   {% if current_user.is_authenticated and current_user.role == 'teacher' %}
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('teacher.send_video') }}">Videos</a>
+    </li>
+  {% endif %}
 
   <!-- Profile Dropdown (for all roles) -->
   <li class="nav-item dropdown">
