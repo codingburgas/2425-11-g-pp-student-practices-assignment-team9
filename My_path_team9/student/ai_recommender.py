@@ -135,9 +135,16 @@ class VideoRecommender:
                         X_train.append(features)
                         y_train.append(0)  # Negative recommendation
 
-        # Generate synthetic data if we don't have enough training examples
-        if len(X_train) < 50:
-            X_train, y_train = self._generate_synthetic_data(X_train, y_train)
+        print(f"Generated {len(X_train)} training examples from real data")
+
+        # Always generate synthetic data to ensure sufficient training examples
+        # and proper class diversity
+        X_train, y_train = self._generate_synthetic_data(X_train, y_train)
+
+        print(f"Final training dataset: {len(X_train)} examples")
+        if len(X_train) > 0:
+            unique_labels = set(y_train)
+            print(f"Class distribution: {dict(zip(*np.unique(y_train, return_counts=True)))}")
 
         return np.array(X_train), np.array(y_train)
 
@@ -157,36 +164,68 @@ class VideoRecommender:
 
         # Generate synthetic examples based on common patterns
         synthetic_patterns = [
-            # High video preference pattern
+            # High video preference pattern (positive examples)
             [1, 1, 1, 1, 0.8, 0.8, 0.75, 0.6, 0.7],  # Features for video lovers
-            # Low video preference pattern
+            [0.8, 0.9, 0.9, 0.8, 0.7, 0.6, 0.8, 0.7, 0.8],  # Another positive pattern
+            [0.9, 0.8, 1, 0.9, 0.6, 0.7, 0.7, 0.8, 0.9],  # High video helpfulness
+            [1, 1, 0.8, 1, 0.5, 0.5, 0.6, 0.5, 0.6],  # Always use videos for tests
+            
+            # Low video preference pattern (negative examples)
             [0, 0.25, 0.3, 0, 0.5, 0.5, 0.5, 0.4, 0.3],  # Features for non-video learners
-            # Moderate video preference pattern
+            [0.2, 0.1, 0.2, 0.1, 0.6, 0.7, 0.4, 0.3, 0.2],  # Another negative pattern
+            [0, 0.3, 0.1, 0.2, 0.8, 0.9, 0.6, 0.2, 0.1],  # High confidence, low video need
+            [0.1, 0.2, 0.3, 0.1, 0.4, 0.3, 0.3, 0.4, 0.2],  # Low interest in videos
+            
+            # Moderate video preference pattern (mixed examples)
             [0.5, 0.75, 0.7, 0.7, 0.6, 0.6, 0.6, 0.6, 0.5],  # Balanced learners
-            # High confidence, low video need
-            [0, 0.5, 0.3, 0.4, 0.8, 1, 0.75, 0.4, 0.7],
-            # Low confidence, high video need
-            [1, 1, 1, 1, 0.4, 0.2, 0.5, 0.8, 0.7],
+            [0.6, 0.5, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],  # Neutral pattern
         ]
 
-        for pattern in synthetic_patterns:
-            # Add some noise to make it more realistic
-            for _ in range(10):
+        # Generate balanced synthetic data
+        positive_patterns = synthetic_patterns[:4]  # First 4 are positive
+        negative_patterns = synthetic_patterns[4:8]  # Next 4 are negative
+        neutral_patterns = synthetic_patterns[8:]  # Last 2 are neutral
+
+        # Generate positive examples
+        for pattern in positive_patterns:
+            for _ in range(8):  # Generate 8 positive examples per pattern
+                noisy_pattern = pattern + np.random.normal(0, 0.08, len(pattern))
+                noisy_pattern = np.clip(noisy_pattern, 0, 1)  # Keep values between 0 and 1
+                X_synthetic.append(noisy_pattern)
+                y_synthetic.append(1)  # Positive
+
+        # Generate negative examples
+        for pattern in negative_patterns:
+            for _ in range(8):  # Generate 8 negative examples per pattern
+                noisy_pattern = pattern + np.random.normal(0, 0.08, len(pattern))
+                noisy_pattern = np.clip(noisy_pattern, 0, 1)  # Keep values between 0 and 1
+                X_synthetic.append(noisy_pattern)
+                y_synthetic.append(0)  # Negative
+
+        # Generate neutral examples (distribute between positive and negative)
+        for pattern in neutral_patterns:
+            for i in range(6):  # Generate 6 neutral examples per pattern
                 noisy_pattern = pattern + np.random.normal(0, 0.1, len(pattern))
                 noisy_pattern = np.clip(noisy_pattern, 0, 1)  # Keep values between 0 and 1
-
                 X_synthetic.append(noisy_pattern)
+                # Alternate between positive and negative for neutral patterns
+                y_synthetic.append(1 if i % 2 == 0 else 0)
 
-                # Determine label based on video preference features
-                video_preference_score = (noisy_pattern[0] + noisy_pattern[2] + noisy_pattern[3]) / 3
-                if video_preference_score > 0.6:
-                    y_synthetic.append(1)  # Positive
-                else:
-                    y_synthetic.append(0)  # Negative
+        # Add some completely random examples for diversity
+        for _ in range(20):
+            random_features = np.random.random(len(self.feature_names))
+            X_synthetic.append(random_features)
+            # Determine label based on video preference features
+            video_preference_score = (random_features[0] + random_features[2] + random_features[3]) / 3
+            y_synthetic.append(1 if video_preference_score > 0.5 else 0)
 
         # Combine existing and synthetic data
-        X_combined = np.vstack([X_existing, X_synthetic]) if len(X_existing) > 0 else np.array(X_synthetic)
-        y_combined = np.concatenate([y_existing, y_synthetic]) if len(y_existing) > 0 else np.array(y_synthetic)
+        if len(X_existing) > 0:
+            X_combined = np.vstack([X_existing, X_synthetic])
+            y_combined = np.concatenate([y_existing, y_synthetic])
+        else:
+            X_combined = np.array(X_synthetic)
+            y_combined = np.array(y_synthetic)
 
         return X_combined, y_combined
 
@@ -206,13 +245,27 @@ class VideoRecommender:
                 return False
 
             # Ensure there are both positive and negative labels
-            if len(set(y_train)) < 2:
-                print("Not enough class diversity in training labels")
-                return False
+            unique_labels = set(y_train)
+            if len(unique_labels) < 2:
+                print(f"Not enough class diversity in training labels. Found: {unique_labels}")
+                # Force generation of synthetic data with both classes
+                X_train, y_train = self._generate_synthetic_data([], [])
+                unique_labels = set(y_train)
+                if len(unique_labels) < 2:
+                    print("Failed to generate diverse synthetic data")
+                    return False
+
+            print(f"Training data: {len(X_train)} examples with {len(unique_labels)} classes")
+            print(f"Class distribution: {dict(zip(*np.unique(y_train, return_counts=True)))}")
+
+            # Ensure minimum dataset size
+            if len(X_train) < 20:
+                print("Dataset too small, generating more synthetic data")
+                X_train, y_train = self._generate_synthetic_data(X_train, y_train)
 
             # Split data for validation
             X_train_split, X_val, y_train_split, y_val = train_test_split(
-                X_train, y_train, test_size=0.2, random_state=42
+                X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
             )
 
             # Scale features
@@ -224,7 +277,8 @@ class VideoRecommender:
                 random_state=42,
                 max_iter=1000,
                 C=1.0,
-                solver='liblinear'
+                solver='liblinear',
+                class_weight='balanced'  # Handle class imbalance
             )
 
             self.model.fit(X_train_scaled, y_train_split)
@@ -234,6 +288,7 @@ class VideoRecommender:
             accuracy = accuracy_score(y_val, y_pred)
 
             print(f"Model trained successfully. Validation accuracy: {accuracy:.3f}")
+            print(f"Training set size: {len(X_train_split)}, Validation set size: {len(X_val)}")
 
             # Save the model
             self.save_model()
@@ -242,6 +297,8 @@ class VideoRecommender:
 
         except Exception as e:
             print(f"Error training model: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False
 
     def predict_video_preference(self, survey):
@@ -439,6 +496,50 @@ class VideoRecommender:
             print(f"Error loading model: {str(e)}")
             return False
 
+    def force_retrain(self):
+        """
+        Force retrain the model, ignoring any existing saved model.
+        
+        Returns:
+            bool: True if training was successful
+        """
+        print("Forcing model retraining...")
+        # Remove existing model files if they exist
+        for path in [self.model_path, self.scaler_path, self.encoders_path]:
+            if os.path.exists(path):
+                try:
+                    os.remove(path)
+                    print(f"Removed existing model file: {path}")
+                except Exception as e:
+                    print(f"Warning: Could not remove {path}: {e}")
+        
+        # Reset model state
+        self.model = None
+        self.scaler = StandardScaler()
+        self.label_encoders = {}
+        
+        # Train new model
+        return self.train_model()
+
 
 # Global recommender instance
 recommender = VideoRecommender()
+
+# Try to load existing model, if not available or fails, train a new one
+def initialize_recommender():
+    """Initialize the global recommender instance."""
+    global recommender
+    
+    print("Initializing AI recommendation system...")
+    
+    # Try to load existing model
+    if not recommender.load_model():
+        print("No existing model found, training new model...")
+        if not recommender.train_model():
+            print("Failed to train model, recommender will use fallback method")
+        else:
+            print("Model trained and saved successfully")
+    else:
+        print("Existing model loaded successfully")
+    
+    return recommender

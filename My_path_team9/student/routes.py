@@ -7,7 +7,7 @@ from ..auth.models import User
 from .models import Survey, Post, Like
 from .forms import VideoSubmissionForm
 from .models import VideoSubmission
-from .ai_recommender import recommender
+from .ai_recommender import initialize_recommender, recommender
 
 
 @student_bp.route('/settings', methods=['GET', 'POST'])
@@ -129,7 +129,14 @@ def dashboard():
         submitted_videos = VideoSubmission.query.all()
         motivational_videos = MotivationalVideo.query.all()
         all_videos = list(submitted_videos) + list(motivational_videos)
-        recommended_videos = recommender.get_recommendations(survey, all_videos, top_k=5)
+        
+        # Initialize recommender if needed
+        try:
+            initialize_recommender()
+            recommended_videos = recommender.get_recommendations(survey, all_videos, top_k=5)
+        except Exception as e:
+            print(f"Error getting recommendations for dashboard: {e}")
+            recommended_videos = []
 
     return render_template(
         'student_dashboard.html',
@@ -347,15 +354,19 @@ def recommendations(survey_id):
         # If no videos are available, return empty recommendations
         return render_template('recommendations.html', recommendations=[], survey=survey)
 
-    # Train the model if it hasn't been trained yet
-    if recommender.model is None:
-        print("Training AI recommendation model...")
-        success = recommender.train_model()
-        if not success:
-            print("Failed to train model, using fallback method")
+    # Initialize the recommender (load existing model or train new one)
+    try:
+        initialize_recommender()
+    except Exception as e:
+        print(f"Error initializing recommender: {e}")
+        # Continue with fallback method
     
     # Get AI-powered recommendations
-    recommendations = recommender.get_recommendations(survey, all_videos, top_k=5)
+    try:
+        recommendations = recommender.get_recommendations(survey, all_videos, top_k=5)
+    except Exception as e:
+        print(f"Error getting recommendations: {e}")
+        recommendations = []
     
     # Add model information for transparency
     model_info = {
