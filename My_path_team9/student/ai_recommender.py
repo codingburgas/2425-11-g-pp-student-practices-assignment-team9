@@ -205,6 +205,11 @@ class VideoRecommender:
                 print("No training data available")
                 return False
 
+            # Ensure there are both positive and negative labels
+            if len(set(y_train)) < 2:
+                print("Not enough class diversity in training labels")
+                return False
+
             # Split data for validation
             X_train_split, X_val, y_train_split, y_val = train_test_split(
                 X_train, y_train, test_size=0.2, random_state=42
