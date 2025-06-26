@@ -1,7 +1,150 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+form {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 800px;
+  margin: 3rem auto;
+  box-shadow: var(--shadow-large);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
 
+body.dark-mode form {
+  background: rgba(50, 44, 84, 0.9);
+  color: #e4e0ff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+.question {
+  margin-bottom: 2rem;
+}
+
+.question label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+body.dark-mode .question label {
+  color: #cdbff0;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: var(--primary-blue);
+}
+
+body.dark-mode input[type="radio"],
+body.dark-mode input[type="checkbox"] {
+  accent-color: #c49cf3;
+}
+
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--dark-blue);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode select {
+  background-color: #443c71;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+button[type="submit"] {
+  background: var(--gradient-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.875rem 2rem;
+  border-radius: 12px;
+  border: none;
+  display: block;
+  margin: 2rem auto 0 auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+body.dark-mode button[type="submit"] {
+  background: linear-gradient(135deg, #8F87F1, #C49CF3);
+}
+.question {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .question {
+  background: rgba(50, 44, 84, 0.9);
+  color: #e4e0ff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+.question:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+.question input:checked + label {
+  font-weight: bold;
+  color: var(--primary-blue);
+}
+form h2 {
+  font-size: 2.5rem;
+  text-align: center;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+form h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+
+</style>
 <form action="{{ url_for('student.survey') }}" method="POST">
     {{ form.csrf_token }}
 
@@ -11,7 +154,7 @@
         <label>Which class and section are you in?</label><br>
         <input type="radio" name="class_section" value="9A"> 9A<br>
         <input type="radio" name="class_section" value="9B"> 9B<br>
-        <input type="radio" name="class_section" value="9C"> 9C<br>
+        <input type="radio" name="class_section" value="9C"> 9V<br>
         <input type="radio" name="class_section" value="9G"> 9G
     </div>
 <br>
