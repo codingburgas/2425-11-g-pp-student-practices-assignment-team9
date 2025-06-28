@@ -1,69 +1,107 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <style>
+
+.find-friends-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.find-friends-header .header-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.13);
+}
+
+.find-friends-header .header-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.find-friends-header .header-subtitle {
+  color: #2563eb;
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
 .student-box {
-  width: 80%;
+  width: 90%;
   max-width: 800px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(59, 130, 246, 0.1);
   border-radius: 20px;
   padding: 2.5rem;
-  box-shadow: var(--shadow-large);
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.08);
+  margin: 0 auto;
   transition: all 0.3s ease;
 }
 
-/* Table Styling */
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.07);
 }
 
 th, td {
   padding: 15px;
   text-align: left;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.13);
 }
 
-/* Table Headers */
 th {
-  background: var(--gradient-primary);
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
   color: white;
   font-weight: 700;
 }
 
-/* Table Rows */
+
 tr:nth-child(even) {
-  background: var(--light-blue);
+  background: #f3f8fe;
 }
 
 tr:hover {
-  background: rgba(59, 130, 246, 0.1);
+  background: #e3f0fd;
   transform: translateY(-2px);
   transition: 0.3s ease;
 }
 
-/* View Button */
 .view-btn {
-  padding: 10px 16px;
+  padding: 8px 18px;
   background: var(--gradient-primary);
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 14px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.10);
 }
 
 .view-btn:hover {
-  background: var(--dark-blue);
+  background: var(--gradient-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }
 
-/* Dark Mode Compatibility */
+
 body.dark-mode .student-box {
   background: rgba(50, 44, 84, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -87,49 +125,42 @@ body.dark-mode tr:hover {
   background: rgba(126, 96, 191, 0.4);
 }
 
-/* Dark Mode Button */
 body.dark-mode .view-btn {
-  background: linear-gradient(135deg, #8F87F1, #C49CF3);
+  background: var(--gradient-primary);
 }
 
 body.dark-mode .view-btn:hover {
-  background: #7D76E8;
+  background: var(--gradient-primary);
 }
 
 </style>
 <div class="container">
-    <div class="student-box">
-        <h1 class="text-center mt-4 mb-3">Find friends</h1>
-        <table>
-            <div id="student-info" style="display:none;">
-            <h2 id="student-name"></h2>
-            <p><strong>Email:</strong> <span id="student-email"></span></p>
-            <p><strong>Role:</strong> <span id="student-role"></span></p>
-        </div>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in students %}
-                <tr onclick="showStudentInfo({
-                    id: {{ student.id }},
-                    username: '{{ student.username }}',
-                    email: '{{ student.email }}',
-                    role: '{{ student.role }}'
-                })">
-                    <td>{{ student.username }}</td>
-                   <td>
-  <a href="{{ url_for('student.profile', user_id=student.id) }}">
-    <button type="button" class="view-btn">View</button>
-</a>
-</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+  <div class="find-friends-header">
+    <div class="header-icon">👥</div>
+    <div class="header-title">Find Friends</div>
+    <div class="header-subtitle">Connect with other students in your school</div>
+  </div>
+  <div class="student-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.username }}</td>
+          <td>
+            <a href="{{ url_for('student.profile', user_id=student.id) }}">
+              <button type="button" class="view-btn">View</button>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

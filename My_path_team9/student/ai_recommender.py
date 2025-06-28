@@ -42,66 +42,71 @@ class VideoRecommender:
         Returns:
             numpy array of features
         """
-        features = []
+        try:
+            features = []
 
-        # Memory method encoding
-        memory_method_map = {
-            'notes': 0, 'videos': 1, 'repetition': 0.5, 'discussion': 0.3
-        }
-        features.append(memory_method_map.get(survey.memory_method, 0))
+            # Memory method encoding
+            memory_method_map = {
+                'notes': 0, 'videos': 1, 'repetition': 0.5, 'discussion': 0.3
+            }
+            features.append(memory_method_map.get(getattr(survey, 'memory_method', ''), 0))
 
-        # Online learning frequency
-        online_learning_map = {
-            'daily': 1, 'few_times': 0.75, 'rarely': 0.25, 'never': 0
-        }
-        features.append(online_learning_map.get(survey.online_learning, 0))
+            # Online learning frequency
+            online_learning_map = {
+                'daily': 1, 'few_times': 0.75, 'rarely': 0.25, 'never': 0
+            }
+            features.append(online_learning_map.get(getattr(survey, 'online_learning', ''), 0))
 
-        # Video helpfulness
-        video_helpful_map = {
-            'very': 1, 'somewhat': 0.7, 'not_much': 0.3, 'not_at_all': 0
-        }
-        features.append(video_helpful_map.get(survey.video_helpful, 0))
+            # Video helpfulness
+            video_helpful_map = {
+                'very': 1, 'somewhat': 0.7, 'not_much': 0.3, 'not_at_all': 0
+            }
+            features.append(video_helpful_map.get(getattr(survey, 'video_helpful', ''), 0))
 
-        # Videos for tests
-        videos_for_tests_map = {
-            'always': 1, 'sometimes': 0.7, 'only_if_needed': 0.4, 'never': 0
-        }
-        features.append(videos_for_tests_map.get(survey.videos_for_tests, 0))
+            # Videos for tests
+            videos_for_tests_map = {
+                'always': 1, 'sometimes': 0.7, 'only_if_needed': 0.4, 'never': 0
+            }
+            features.append(videos_for_tests_map.get(getattr(survey, 'videos_for_tests', ''), 0))
 
-        # Interest level
-        interest_level_map = {
-            'very_high': 1, 'high': 0.8, 'medium': 0.5, 'low': 0.2, 'very_low': 0
-        }
-        features.append(interest_level_map.get(survey.interest_level, 0.5))
+            # Interest level
+            interest_level_map = {
+                'very_high': 1, 'high': 0.8, 'medium': 0.5, 'low': 0.2, 'very_low': 0
+            }
+            features.append(interest_level_map.get(getattr(survey, 'interest_level', ''), 0.5))
 
-        # Confidence level
-        confidence_map = {
-            'very_confident': 1, 'confident': 0.8, 'neutral': 0.5,
-            'not_confident': 0.2, 'very_not_confident': 0
-        }
-        features.append(confidence_map.get(survey.confidence, 0.5))
+            # Confidence level
+            confidence_map = {
+                'very_confident': 1, 'confident': 0.8, 'neutral': 0.5,
+                'not_confident': 0.2, 'very_not_confident': 0
+            }
+            features.append(confidence_map.get(getattr(survey, 'confidence', ''), 0.5))
 
-        # Study time
-        study_time_map = {
-            'more_than_4_hours': 1, '2_4_hours': 0.75, '1_2_hours': 0.5,
-            'less_than_1_hour': 0.25, 'no_time': 0
-        }
-        features.append(study_time_map.get(survey.study_time, 0.5))
+            # Study time
+            study_time_map = {
+                'more_than_4_hours': 1, '2_4_hours': 0.75, '1_2_hours': 0.5,
+                'less_than_1_hour': 0.25, 'no_time': 0
+            }
+            features.append(study_time_map.get(getattr(survey, 'study_time', ''), 0.5))
 
-        # Ideal video length
-        ideal_length_map = {
-            'less_than_5_min': 0.2, '5_10_min': 0.4, '10_15_min': 0.6,
-            '15_30_min': 0.8, 'more_than_30_min': 1
-        }
-        features.append(ideal_length_map.get(survey.ideal_length, 0.6))
+            # Ideal video length
+            ideal_length_map = {
+                'less_than_5_min': 0.2, '5_10_min': 0.4, '10_15_min': 0.6,
+                '15_30_min': 0.8, 'more_than_30_min': 1
+            }
+            features.append(ideal_length_map.get(getattr(survey, 'ideal_length', ''), 0.6))
 
-        # Review before class
-        review_map = {
-            'always': 1, 'sometimes': 0.7, 'rarely': 0.3, 'never': 0
-        }
-        features.append(review_map.get(survey.review_before_class, 0.5))
+            # Review before class
+            review_map = {
+                'always': 1, 'sometimes': 0.7, 'rarely': 0.3, 'never': 0
+            }
+            features.append(review_map.get(getattr(survey, 'review_before_class', ''), 0.5))
 
-        return np.array(features)
+            return np.array(features)
+        except Exception as e:
+            print(f"Error preparing survey features: {e}")
+            # Return default features if there's an error
+            return np.array([0.5] * len(self.feature_names))
 
     def generate_training_data(self):
         """
@@ -263,36 +268,58 @@ class VideoRecommender:
                 print("Dataset too small, generating more synthetic data")
                 X_train, y_train = self._generate_synthetic_data(X_train, y_train)
 
-            # Split data for validation
-            X_train_split, X_val, y_train_split, y_val = train_test_split(
-                X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
-            )
+            # Ensure we have enough data for splitting
+            if len(X_train) < 10:
+                print("Insufficient data for proper training, using all data")
+                X_train_scaled = self.scaler.fit_transform(X_train)
+                
+                # Train logistic regression model with minimal data
+                self.model = LogisticRegression(
+                    random_state=42,
+                    max_iter=500,  # Reduce iterations for small datasets
+                    C=1.0,
+                    solver='liblinear',
+                    class_weight='balanced'
+                )
+                
+                self.model.fit(X_train_scaled, y_train)
+                print("Model trained with minimal data")
+            else:
+                # Split data for validation
+                try:
+                    X_train_split, X_val, y_train_split, y_val = train_test_split(
+                        X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
+                    )
+                except ValueError as e:
+                    print(f"Error in train_test_split: {e}, using all data")
+                    X_train_split, y_train_split = X_train, y_train
+                    X_val, y_val = X_train, y_train
 
-            # Scale features
-            X_train_scaled = self.scaler.fit_transform(X_train_split)
-            X_val_scaled = self.scaler.transform(X_val)
+                # Scale features
+                X_train_scaled = self.scaler.fit_transform(X_train_split)
+                X_val_scaled = self.scaler.transform(X_val)
 
-            # Train logistic regression model
-            self.model = LogisticRegression(
-                random_state=42,
-                max_iter=1000,
-                C=1.0,
-                solver='liblinear',
-                class_weight='balanced'  # Handle class imbalance
-            )
+                # Train logistic regression model
+                self.model = LogisticRegression(
+                    random_state=42,
+                    max_iter=1000,
+                    C=1.0,
+                    solver='liblinear',
+                    class_weight='balanced'  # Handle class imbalance
+                )
 
-            self.model.fit(X_train_scaled, y_train_split)
+                self.model.fit(X_train_scaled, y_train_split)
 
-            # Evaluate model
-            y_pred = self.model.predict(X_val_scaled)
-            accuracy = accuracy_score(y_val, y_pred)
-
-            print(f"Model trained successfully. Validation accuracy: {accuracy:.3f}")
-            print(f"Training set size: {len(X_train_split)}, Validation set size: {len(X_val)}")
+                # Evaluate model if we have validation data
+                if len(X_val) > 0 and len(set(y_val)) > 1:
+                    y_pred = self.model.predict(X_val_scaled)
+                    accuracy = accuracy_score(y_val, y_pred)
+                    print(f"Model trained successfully. Validation accuracy: {accuracy:.3f}")
+                else:
+                    print("Model trained successfully (no validation data available)")
 
             # Save the model
             self.save_model()
-
             return True
 
         except Exception as e:
@@ -311,21 +338,26 @@ class VideoRecommender:
         Returns:
             float: Probability of positive preference (0-1)
         """
-        if self.model is None:
-            self.load_model()
+        try:
+            if self.model is None:
+                self.load_model()
 
-        if self.model is None:
-            # Fallback to simple heuristic if model not available
+            if self.model is None:
+                # Fallback to simple heuristic if model not available
+                return self._fallback_prediction(survey)
+
+            # Prepare features
+            features = self.prepare_survey_features(survey)
+            features_scaled = self.scaler.transform(features.reshape(1, -1))
+
+            # Get prediction probability
+            prob_positive = self.model.predict_proba(features_scaled)[0][1]
+
+            return prob_positive
+        except Exception as e:
+            print(f"Error in predict_video_preference: {e}")
+            # Fallback to simple heuristic if model fails
             return self._fallback_prediction(survey)
-
-        # Prepare features
-        features = self.prepare_survey_features(survey)
-        features_scaled = self.scaler.transform(features.reshape(1, -1))
-
-        # Get prediction probability
-        prob_positive = self.model.predict_proba(features_scaled)[0][1]
-
-        return prob_positive
 
     def _fallback_prediction(self, survey):
         """
@@ -337,18 +369,23 @@ class VideoRecommender:
         Returns:
             float: Simple heuristic score
         """
-        # Simple heuristic based on key video preference indicators
-        memory_method_map = {'notes': 0, 'videos': 1, 'repetition': 0.5, 'discussion': 0.3}
-        video_helpful_map = {'very': 1, 'somewhat': 0.7, 'not_much': 0.3, 'not_at_all': 0}
-        videos_for_tests_map = {'always': 1, 'sometimes': 0.7, 'only_if_needed': 0.4, 'never': 0}
+        try:
+            # Simple heuristic based on key video preference indicators
+            memory_method_map = {'notes': 0, 'videos': 1, 'repetition': 0.5, 'discussion': 0.3}
+            video_helpful_map = {'very': 1, 'somewhat': 0.7, 'not_much': 0.3, 'not_at_all': 0}
+            videos_for_tests_map = {'always': 1, 'sometimes': 0.7, 'only_if_needed': 0.4, 'never': 0}
 
-        score = (
-                memory_method_map.get(survey.memory_method, 0) * 0.4 +
-                video_helpful_map.get(survey.video_helpful, 0) * 0.4 +
-                videos_for_tests_map.get(survey.videos_for_tests, 0) * 0.2
-        )
+            score = (
+                    memory_method_map.get(getattr(survey, 'memory_method', ''), 0) * 0.4 +
+                    video_helpful_map.get(getattr(survey, 'video_helpful', ''), 0) * 0.4 +
+                    videos_for_tests_map.get(getattr(survey, 'videos_for_tests', ''), 0) * 0.2
+            )
 
-        return score
+            return score
+        except Exception as e:
+            print(f"Error in fallback prediction: {e}")
+            # Return neutral score as ultimate fallback
+            return 0.5
 
     def get_recommendations(self, survey, videos, top_k=5):
         """
@@ -365,23 +402,33 @@ class VideoRecommender:
         if not videos:
             return []
 
-        # Get base preference score
-        base_score = self.predict_video_preference(survey)
+        try:
+            # Get base preference score
+            base_score = self.predict_video_preference(survey)
+        except Exception as e:
+            print(f"Error predicting video preference: {e}")
+            # Use fallback prediction
+            base_score = self._fallback_prediction(survey)
 
         recommendations = []
 
         for video in videos:
-            # Calculate video-specific score
-            video_score = self._calculate_video_score(video, survey, base_score)
+            try:
+                # Calculate video-specific score
+                video_score = self._calculate_video_score(video, survey, base_score)
 
-            # Generate recommendation reason
-            reason = self._generate_recommendation_reason(video, survey, video_score)
+                # Generate recommendation reason
+                reason = self._generate_recommendation_reason(video, survey, video_score)
 
-            recommendations.append({
-                'video': video,
-                'score': video_score,
-                'reason': reason
-            })
+                recommendations.append({
+                    'video': video,
+                    'score': video_score,
+                    'reason': reason
+                })
+            except Exception as e:
+                print(f"Error processing video {video.id}: {e}")
+                # Skip this video if there's an error
+                continue
 
         # Sort by score and return top_k
         recommendations.sort(key=lambda x: x['score'], reverse=True)
@@ -399,34 +446,45 @@ class VideoRecommender:
         Returns:
             float: Final recommendation score
         """
-        score = base_score
+        try:
+            score = base_score
 
-        # Subject matching bonus
-        if survey.hardest_subject.lower() in video.video_link.lower():
-            score += 0.2
+            # Subject matching bonus
+            if hasattr(survey, 'hardest_subject') and survey.hardest_subject:
+                if survey.hardest_subject.lower() in video.video_link.lower():
+                    score += 0.2
 
-        if survey.favorite_subject.lower() in video.video_link.lower():
-            score += 0.1
+            if hasattr(survey, 'favorite_subject') and survey.favorite_subject:
+                if survey.favorite_subject.lower() in video.video_link.lower():
+                    score += 0.1
 
-        # Video rating bonus (if available)
-        if hasattr(video, 'ratings') and video.ratings:
-            avg_rating = sum(r.rating for r in video.ratings) / len(video.ratings)
-            score += (avg_rating - 3) * 0.05  # Bonus for high ratings
+            # Video rating bonus (if available)
+            if hasattr(video, 'ratings') and video.ratings:
+                try:
+                    avg_rating = sum(r.rating for r in video.ratings) / len(video.ratings)
+                    score += (avg_rating - 3) * 0.05  # Bonus for high ratings
+                except Exception as e:
+                    print(f"Error calculating average rating: {e}")
 
-        # Length preference matching
-        ideal_length_map = {
-            'less_than_5_min': 0.2, '5_10_min': 0.4, '10_15_min': 0.6,
-            '15_30_min': 0.8, 'more_than_30_min': 1
-        }
-        length_preference = ideal_length_map.get(survey.ideal_length, 0.6)
+            # Length preference matching
+            if hasattr(survey, 'ideal_length') and survey.ideal_length:
+                ideal_length_map = {
+                    'less_than_5_min': 0.2, '5_10_min': 0.4, '10_15_min': 0.6,
+                    '15_30_min': 0.8, 'more_than_30_min': 1
+                }
+                length_preference = ideal_length_map.get(survey.ideal_length, 0.6)
 
-        # Add small variation based on video ID to avoid identical scores
-        unique_offset = (video.id % 100) * 0.001
+            # Add small variation based on video ID to avoid identical scores
+            unique_offset = (video.id % 100) * 0.001
 
-        # Final score with caps
-        final_score = min(max(score + unique_offset, 0), 1)
+            # Final score with caps
+            final_score = min(max(score + unique_offset, 0), 1)
 
-        return final_score
+            return final_score
+        except Exception as e:
+            print(f"Error calculating video score: {e}")
+            # Return base score as fallback
+            return min(max(base_score, 0), 1)
 
     def _generate_recommendation_reason(self, video, survey, score):
         """
@@ -440,35 +498,44 @@ class VideoRecommender:
         Returns:
             str: Explanation for the recommendation
         """
-        reasons = []
+        try:
+            reasons = []
 
-        if score > 0.8:
-            reasons.append("This video highly matches your learning preferences")
-        elif score > 0.6:
-            reasons.append("This video aligns well with your study habits")
-        else:
-            reasons.append("This video may be helpful for your learning style")
+            if score > 0.8:
+                reasons.append("This video highly matches your learning preferences")
+            elif score > 0.6:
+                reasons.append("This video aligns well with your study habits")
+            else:
+                reasons.append("This video may be helpful for your learning style")
 
-        # Add specific reasons based on survey data
-        if survey.memory_method == 'videos':
-            reasons.append("and your preference for video-based learning")
+            # Add specific reasons based on survey data
+            if hasattr(survey, 'memory_method') and survey.memory_method == 'videos':
+                reasons.append("and your preference for video-based learning")
 
-        if survey.video_helpful in ['very', 'somewhat']:
-            reasons.append("and your positive experience with educational videos")
+            if hasattr(survey, 'video_helpful') and survey.video_helpful in ['very', 'somewhat']:
+                reasons.append("and your positive experience with educational videos")
 
-        if survey.hardest_subject.lower() in video.video_link.lower():
-            reasons.append(f"and may help with your challenging subject ({survey.hardest_subject})")
+            if hasattr(survey, 'hardest_subject') and survey.hardest_subject:
+                if survey.hardest_subject.lower() in video.video_link.lower():
+                    reasons.append(f"and may help with your challenging subject ({survey.hardest_subject})")
 
-        if survey.favorite_subject.lower() in video.video_link.lower():
-            reasons.append(f"and relates to your favorite subject ({survey.favorite_subject})")
+            if hasattr(survey, 'favorite_subject') and survey.favorite_subject:
+                if survey.favorite_subject.lower() in video.video_link.lower():
+                    reasons.append(f"and relates to your favorite subject ({survey.favorite_subject})")
 
-        # Add rating-based reason if available
-        if hasattr(video, 'ratings') and video.ratings:
-            avg_rating = sum(r.rating for r in video.ratings) / len(video.ratings)
-            if avg_rating >= 4:
-                reasons.append("and has received excellent ratings from other students")
+            # Add rating-based reason if available
+            if hasattr(video, 'ratings') and video.ratings:
+                try:
+                    avg_rating = sum(r.rating for r in video.ratings) / len(video.ratings)
+                    if avg_rating >= 4:
+                        reasons.append("and has received excellent ratings from other students")
+                except Exception as e:
+                    print(f"Error calculating average rating for reason: {e}")
 
-        return " ".join(reasons)
+            return " ".join(reasons)
+        except Exception as e:
+            print(f"Error generating recommendation reason: {e}")
+            return "This video may be helpful for your learning style"
 
     def save_model(self):
         """Save the trained model and scaler to disk."""
@@ -532,14 +599,35 @@ def initialize_recommender():
     
     print("Initializing AI recommendation system...")
     
-    # Try to load existing model
-    if not recommender.load_model():
-        print("No existing model found, training new model...")
-        if not recommender.train_model():
-            print("Failed to train model, recommender will use fallback method")
+    try:
+        # Try to load existing model
+        if not recommender.load_model():
+            print("No existing model found, training new model...")
+            # Use a timeout to prevent blocking survey completion
+            import threading
+            import time
+            
+            # Start training in a separate thread to avoid blocking
+            def train_model_async():
+                try:
+                    if recommender.train_model():
+                        print("Model trained and saved successfully")
+                    else:
+                        print("Failed to train model, recommender will use fallback method")
+                except Exception as e:
+                    print(f"Error in async model training: {e}")
+            
+            # Start training thread
+            training_thread = threading.Thread(target=train_model_async)
+            training_thread.daemon = True  # Don't block application shutdown
+            training_thread.start()
+            
+            # Don't wait for training to complete - let it run in background
+            print("Model training started in background")
         else:
-            print("Model trained and saved successfully")
-    else:
-        print("Existing model loaded successfully")
+            print("Existing model loaded successfully")
+    except Exception as e:
+        print(f"Error initializing recommender: {e}")
+        print("Recommender will use fallback method")
     
     return recommender

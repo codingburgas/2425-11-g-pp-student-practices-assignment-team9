@@ -1,47 +1,236 @@
 {% extends 'base.html' %}
 
-{% block title %}Settings{% endblock %}
+{% block title %}Student Settings{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2 class="text-center">Settings</h2>
+<style>
+.settings-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
-  <form method="POST">
-    {{ form.hidden_tag() }}
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
 
-    <h3 class="text-center mt-4 mb-3">Change Personal Information</h3>
+.page-title {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
 
-    <div class="mb-3">
-      {{ form.username.label(class="form-label") }}
-      {{ form.username(class="form-control") }}
+.page-subtitle {
+  font-size: 1.2rem;
+  color: #2563eb;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.page-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+  font-size: 2rem;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+}
+
+.settings-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.settings-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.1);
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0;
+}
+
+.enhanced-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #bcd7fa;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2563eb;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 1);
+}
+
+.form-input::placeholder {
+  color: #a0b7e6;
+  font-weight: 400;
+}
+
+.submit-section {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 2px solid #bcd7fa;
+  margin-top: 1rem;
+}
+
+.submit-button {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.13);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.submit-button:hover {
+  background: var(--gradient-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.18);
+}
+
+.submit-button:active {
+  transform: translateY(-1px);
+}
+</style>
+
+<div class="settings-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-icon">👤</div>
+    <h1 class="page-title">Student Settings</h1>
+    <p class="page-subtitle">Manage your account and preferences</p>
+  </div>
+
+  <!-- Personal Information Card -->
+  <div class="settings-card">
+    <div class="card-header">
+      <div class="card-icon">📝</div>
+      <h2 class="card-title">Personal Information</h2>
     </div>
+    <form method="POST" class="enhanced-form">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        {{ form.username(class="form-input", placeholder="Enter your username") }}
+      </div>
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        {{ form.email(class="form-input", placeholder="Enter your email address") }}
+      </div>
+    </form>
+  </div>
 
-    <div class="mb-3">
-      {{ form.email.label(class="form-label") }}
-      {{ form.email(class="form-control") }}
+  <!-- Password Change Card -->
+  <div class="settings-card">
+    <div class="card-header">
+      <div class="card-icon">🔒</div>
+      <h2 class="card-title">Change Password</h2>
     </div>
-
-    <hr>
-
-
-    <div class="mb-3">
-      {{ form.current_password.label(class="form-label") }}
-      {{ form.current_password(class="form-control") }}
-    </div>
-
-    <div class="mb-3">
-      {{ form.new_password.label(class="form-label") }}
-      {{ form.new_password(class="form-control") }}
-    </div>
-
-    <div class="mb-3">
-      {{ form.confirm_password.label(class="form-label") }}
-      {{ form.confirm_password(class="form-control") }}
-    </div>
-
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label.text }}</button>
-    </div>
-  </form>
+    <form method="POST" class="enhanced-form" id="password-form">
+      <div class="form-group">
+        <label for="current_password" class="form-label">Current Password</label>
+        {{ form.current_password(class="form-input", placeholder="Enter your current password") }}
+      </div>
+      <div class="form-group">
+        <label for="new_password" class="form-label">New Password</label>
+        {{ form.new_password(class="form-input", placeholder="Enter your new password") }}
+      </div>
+      <div class="form-group">
+        <label for="confirm_password" class="form-label">Confirm New Password</label>
+        {{ form.confirm_password(class="form-input", placeholder="Confirm your new password") }}
+      </div>
+      <div class="submit-section">
+        <button type="submit" class="submit-button">
+          {{ form.submit.label.text }}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
