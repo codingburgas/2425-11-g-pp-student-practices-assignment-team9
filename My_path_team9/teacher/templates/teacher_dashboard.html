@@ -1,56 +1,505 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
 
-<div class="container my-5">
-  <div class="card shadow-sm border-0">
+.dashboard-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
-    <div class="card-body p-0">
-      <div class="table-responsive">
-      <h4 class="text-center mb-4">Video Submissions</h4>
-        <table class="table table-hover table-bordered align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th scope="col">👤 Student</th>
-              <th scope="col">🔗 Video Link</th>
-              <th scope="col">📌 Status</th>
-              <th scope="col">⚙️ Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for submission in submissions %}
-            <tr>
-              <td>{{ submission.student.username }}</td>
-              <td>
-                <a href="{{ submission.video_link }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                  View Video
-                </a>
-              </td>
-              <td>
-                {% if submission.confirmed %}
-                  <span class="badge bg-success">Approved</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark">Pending</span>
-                {% endif %}
-              </td>
-              <td>
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.dashboard-title {
+  font-size: 3rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.dashboard-subtitle {
+  font-size: 1.2rem;
+  color: var(--dark-blue);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.dashboard-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+  font-size: 2rem;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  box-shadow: var(--shadow-large);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--gradient-primary);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--dark-blue);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: var(--dark-blue);
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+/* Main Content Card */
+.main-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-large);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.main-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.1);
+}
+
+.section-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--gradient-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dark-blue);
+  margin: 0;
+}
+
+/* Enhanced Table */
+.enhanced-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 15px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+}
+
+.enhanced-table thead {
+  background: var(--gradient-primary);
+}
+
+.enhanced-table th {
+  padding: 1.2rem 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+  border: none;
+}
+
+.enhanced-table td {
+  padding: 1.2rem 1rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+.enhanced-table tbody tr:hover td {
+  background: rgba(59, 130, 246, 0.05);
+  transform: scale(1.01);
+}
+
+.enhanced-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-approved {
+  background: rgba(34, 197, 94, 0.1);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.btn-approve {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+.btn-approve:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-reject {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+}
+
+.btn-reject:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-view {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.btn-view:hover {
+  background: var(--gradient-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  color: white;
+  text-decoration: none;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--dark-blue);
+  opacity: 0.7;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+  
+  .dashboard-title {
+    font-size: 2.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .main-card {
+    padding: 1.5rem;
+  }
+  
+  .enhanced-table {
+    font-size: 0.9rem;
+  }
+  
+  .enhanced-table th,
+  .enhanced-table td {
+    padding: 0.8rem 0.5rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Animation for cards */
+.stat-card,
+.main-card {
+  animation: slideInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-icon">👨‍🏫</div>
+    <h1 class="dashboard-title">Teacher Dashboard</h1>
+    <p class="dashboard-subtitle">Manage your students and video submissions</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-number">{{ submissions|length }}</div>
+      <div class="stat-label">Total Submissions</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-number">{{ submissions|selectattr('confirmed')|list|length }}</div>
+      <div class="stat-label">Approved Videos</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-number">{{ submissions|rejectattr('confirmed')|list|length }}</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">🎬</div>
+      <div class="stat-number">{{ submissions|selectattr('confirmed')|list|length }}</div>
+      <div class="stat-label">Active Videos</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-card">
+    <div class="section-header">
+      <div class="section-icon">📹</div>
+      <h2 class="section-title">Video Submissions</h2>
+    </div>
+
+    {% if submissions %}
+    <div class="table-responsive">
+      <table class="enhanced-table">
+        <thead>
+          <tr>
+            <th>👤 Student</th>
+            <th>🔗 Video Link</th>
+            <th>📌 Status</th>
+            <th>⚙️ Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for submission in submissions %}
+          <tr>
+            <td>
+              <strong>{{ submission.student.username }}</strong>
+              <br>
+              <small style="color: #6c757d;">{{ submission.student.email }}</small>
+            </td>
+            <td>
+              <a href="{{ submission.video_link }}" class="btn-action btn-view" target="_blank">
+                <i data-lucide="play" style="width: 14px; height: 14px;"></i>
+                View Video
+              </a>
+            </td>
+            <td>
+              {% if submission.confirmed %}
+                <span class="status-badge status-approved">
+                  <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
+                  Approved
+                </span>
+              {% else %}
+                <span class="status-badge status-pending">
+                  <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                  Pending
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="action-buttons">
                 {% if not submission.confirmed %}
-                  <a href="{{ url_for('teacher.approve_video', submission_id=submission.id) }}" class="btn btn-sm btn-success">
+                  <a href="{{ url_for('teacher.approve_video', submission_id=submission.id) }}" class="btn-action btn-approve">
+                    <i data-lucide="check" style="width: 14px; height: 14px;"></i>
                     Approve
                   </a>
-                  <a href="{{ url_for('teacher.reject_video', submission_id=submission.id) }}" class="btn btn-sm btn-danger">
+                  <a href="{{ url_for('teacher.reject_video', submission_id=submission.id) }}" class="btn-action btn-reject">
+                    <i data-lucide="x" style="width: 14px; height: 14px;"></i>
                     Reject
                   </a>
                 {% else %}
-                  <em class="text-muted">Approved</em>
+                  <span style="color: #6c757d; font-style: italic;">
+                    <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
+                    Already Approved
+                  </span>
                 {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>No Video Submissions Yet</h3>
+      <p>Students haven't submitted any videos for review.</p>
+    </div>
+    {% endif %}
   </div>
 </div>
+
+<script>
+lucide.createIcons();
+</script>
+
 {% endblock %}
