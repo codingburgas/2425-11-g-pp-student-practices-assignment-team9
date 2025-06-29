@@ -717,6 +717,40 @@ body.dark-mode .navbar-brand img.dark-mode-logo {
           Teacher Dashboard
         </a>
       </li>
+    {% elif current_user.role == 'admin' %}
+      <!-- Admin Links -->
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+          <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
+          Admin Dashboard
+        </a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+          Management
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="adminMenu">
+          <li>
+            <a class="dropdown-item" href="{{ url_for('admin.users_list') }}">
+              <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+              Manage Users
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="{{ url_for('admin.motivational_videos') }}">
+              <i data-lucide="video" style="width: 16px; height: 16px;"></i>
+              Motivational Videos
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="{{ url_for('admin.video_submissions') }}">
+              <i data-lucide="upload" style="width: 16px; height: 16px;"></i>
+              Video Submissions
+            </a>
+          </li>
+        </ul>
+      </li>
     {% endif %}
    {% if current_user.is_authenticated and current_user.role == 'teacher' %}
       <li class="nav-item">
