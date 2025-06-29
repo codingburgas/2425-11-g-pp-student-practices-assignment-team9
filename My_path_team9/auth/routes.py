@@ -40,6 +40,8 @@ def login():
                 return redirect(url_for('student.survey'))
             elif user.role == 'teacher':
                 return redirect(url_for('teacher.dashboard'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin.dashboard'))
             else:
                 return redirect(url_for('main_bp.index'))
 
