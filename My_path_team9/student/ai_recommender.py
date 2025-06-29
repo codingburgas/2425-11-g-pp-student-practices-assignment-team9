@@ -116,29 +116,45 @@ class VideoRecommender:
         Returns:
             tuple: (X_train, y_train) - features and labels for training
         """
+        print("Starting to generate training data...")
         # Get all surveys and video ratings
-        surveys = Survey.query.all()
-        video_ratings = VideoRating.query.all()
+        try:
+            surveys = Survey.query.all()
+            print(f"Found {len(surveys)} surveys in database")
+        except Exception as e:
+            print(f"Error querying surveys: {e}")
+            surveys = []
+            
+        try:
+            video_ratings = VideoRating.query.all()
+            print(f"Found {len(video_ratings)} video ratings in database")
+        except Exception as e:
+            print(f"Error querying video ratings: {e}")
+            video_ratings = []
 
         X_train = []
         y_train = []
 
         # Create training examples from existing data
         for survey in surveys:
-            features = self.prepare_survey_features(survey)
+            try:
+                features = self.prepare_survey_features(survey)
 
-            # Get user's video ratings to create positive/negative examples
-            user_ratings = VideoRating.query.filter_by(student_id=survey.user_id).all()
+                # Get user's video ratings to create positive/negative examples
+                user_ratings = VideoRating.query.filter_by(student_id=survey.user_id).all()
 
-            if user_ratings:
-                for rating in user_ratings:
-                    # Positive example if rating >= 4, negative if <= 2
-                    if rating.rating >= 4:
-                        X_train.append(features)
-                        y_train.append(1)  # Positive recommendation
-                    elif rating.rating <= 2:
-                        X_train.append(features)
-                        y_train.append(0)  # Negative recommendation
+                if user_ratings:
+                    for rating in user_ratings:
+                        # Positive example if rating >= 4, negative if <= 2
+                        if rating.rating >= 4:
+                            X_train.append(features)
+                            y_train.append(1)  # Positive recommendation
+                        elif rating.rating <= 2:
+                            X_train.append(features)
+                            y_train.append(0)  # Negative recommendation
+            except Exception as e:
+                print(f"Error processing survey {survey.id}: {e}")
+                continue
 
         print(f"Generated {len(X_train)} training examples from real data")
 
@@ -606,16 +622,31 @@ def initialize_recommender():
             # Use a timeout to prevent blocking survey completion
             import threading
             import time
+            from flask import current_app
             
             # Start training in a separate thread to avoid blocking
             def train_model_async():
                 try:
-                    if recommender.train_model():
-                        print("Model trained and saved successfully")
-                    else:
-                        print("Failed to train model, recommender will use fallback method")
+                    print("Background training thread started...")
+                    # Create application context for the background thread
+                    from .. import create_app
+                    from ..config import Config
+                    
+                    print("Creating Flask app for background thread...")
+                    # Create a new app instance for the background thread
+                    app = create_app(Config)
+                    print("Flask app created successfully")
+                    
+                    with app.app_context():
+                        print("Entered application context, starting model training...")
+                        if recommender.train_model():
+                            print("Model trained and saved successfully")
+                        else:
+                            print("Failed to train model, recommender will use fallback method")
                 except Exception as e:
                     print(f"Error in async model training: {e}")
+                    import traceback
+                    traceback.print_exc()
             
             # Start training thread
             training_thread = threading.Thread(target=train_model_async)
