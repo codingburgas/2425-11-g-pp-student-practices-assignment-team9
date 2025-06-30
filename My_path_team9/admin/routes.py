@@ -3,8 +3,8 @@ from flask_login import login_required, current_user
 from . import admin_bp
 from .. import db
 from ..auth.models import User
-from ..teacher.models import MotivationalVideo
-from ..student.models import VideoSubmission
+from ..teacher.models import MotivationalVideo, VideoRating
+from ..student.models import VideoSubmission, Survey, Post
 
 
 def admin_required(f):
@@ -61,10 +61,17 @@ def delete_user(user_id):
         flash('You cannot delete other admin accounts.', 'danger')
         return redirect(url_for('admin.users_list'))
 
-    username = user.username
+    # Delete related records to avoid foreign key constraint issues
+    Survey.query.filter_by(user_id=user.id).delete()
+    VideoSubmission.query.filter_by(student_id=user.id).delete()
+    Post.query.filter_by(user_id=user.id).delete()
+    VideoRating.query.filter_by(student_id=user.id).delete()
+
+    # Now delete the user
     db.session.delete(user)
     db.session.commit()
-    flash(f'User {username} has been deleted successfully.', 'success')
+
+    flash(f'User {user.username} has been deleted successfully.', 'success')
     return redirect(url_for('admin.users_list'))
 
 
@@ -117,10 +124,17 @@ def motivational_videos():
 @admin_required
 def delete_motivational_video(video_id):
     """Delete a motivational video (admin only)"""
+
     video = MotivationalVideo.query.get_or_404(video_id)
     title = video.title
+
+    # Delete related video ratings to avoid foreign key constraint errors
+    VideoRating.query.filter_by(video_id=video.id).delete()
+
+    # Now delete the video
     db.session.delete(video)
     db.session.commit()
+
     flash(f'Motivational video "{title}" has been deleted successfully.', 'success')
     return redirect(url_for('admin.motivational_videos'))
 
@@ -143,5 +157,6 @@ def delete_video_submission(submission_id):
     video_link = submission.video_link
     db.session.delete(submission)
     db.session.commit()
+
     flash(f'Video submission "{video_link}" has been deleted successfully.', 'success')
     return redirect(url_for('admin.video_submissions'))

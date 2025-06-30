@@ -1,11 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
 
-from .models import MotivationalVideo
+from .models import MotivationalVideo, VideoRating
 from .. import db
 from ..auth.models import User
 from ..student.forms import SettingsForm
-from ..student.models import VideoSubmission
+from ..student.models import VideoSubmission, Survey, Post
 from . import teacher_bp
 
 @teacher_bp.route('/send_video', methods=['GET', 'POST'])
@@ -178,12 +178,12 @@ def students_list():
 @login_required
 def delete_student(user_id):
     """
-       Deletes a student account based on the provided user ID.
+    Deletes a student account based on the provided user ID.
 
-       Ensures only students can be deleted and that the current user has the 'teacher' role.
+    Ensures only students can be deleted and that the current user has the 'teacher' role.
 
-       :param user_id: ID of the student user to delete
-       """
+    :param user_id: ID of the student user to delete
+    """
     if current_user.role != 'teacher':
         flash('You do not have permission to perform this action.', 'danger')
         return redirect(url_for('main.home'))
@@ -193,8 +193,16 @@ def delete_student(user_id):
         flash('You can only delete students.', 'warning')
         return redirect(url_for('teacher.students_list'))
 
+    # Delete related data explicitly
+    Survey.query.filter_by(user_id=student.id).delete()
+    VideoSubmission.query.filter_by(student_id=student.id).delete()
+    Post.query.filter_by(user_id=student.id).delete()
+
+    # Delete video ratings related to the student to avoid FK constraint errors
+    VideoRating.query.filter_by(student_id=student.id).delete()
+
     db.session.delete(student)
     db.session.commit()
+
     flash(f'The student {student.email} was deleted successfully.', 'success')
     return redirect(url_for('teacher.students_list'))
-
