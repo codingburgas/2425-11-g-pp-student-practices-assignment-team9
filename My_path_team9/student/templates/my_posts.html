@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .my-posts-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .my-posts-header .header-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(90deg, #3b82f6, #2563eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        margin: 0 auto 1rem auto;
+        box-shadow: 0 6px 24px rgba(59, 130, 246, 0.13);
+    }
+
+    .my-posts-header .header-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .my-posts-header .header-subtitle {
+        color: #2563eb;
+        font-size: 1.1rem;
+        opacity: 0.8;
+        margin-bottom: 0;
+    }
+
+    .student-box {
+        width: 90%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 24px rgba(59, 130, 246, 0.08);
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+
+    .post-form textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #bcd6fa;
+        resize: vertical;
+        font-size: 1rem;
+        background: #f3f8fe;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.07);
+        transition: border 0.2s;
+    }
+
+    .post-form textarea:focus {
+        border: 1.5px solid #2563eb;
+        outline: none;
+    }
+
+    .view-btn {
+        padding: 8px 22px;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.10);
+    }
+
+    .view-btn:hover {
+        background: var(--gradient-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    }
+
+    .post-box {
+        background: rgba(243, 248, 254, 0.95);
+        padding: 1.5rem;
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+        margin-bottom: 1.5rem;
+        border: 1px solid #e3f0fd;
+    }
+
+    .post-image {
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .post-meta {
+        color: #2563eb;
+        font-size: 0.95rem;
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+
+    .post-actions {
+        display: flex;
+        gap: 18px;
+        margin-top: 0.75rem;
+    }
+
+    .link-style {
+        color: #2563eb;
+        text-decoration: underline;
+        font-weight: 600;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .link-style:hover {
+        color: #1557b0;
+    }
+
+    .no-posts {
+        color: #6b7280;
+        text-align: center;
+        font-size: 1.1rem;
+        margin-top: 2rem;
+    }
+
+    body.dark-mode .student-box {
+        background: rgba(50, 44, 84, 0.95);
+        color: #e4e0ff;
+    }
+
+    body.dark-mode .post-box {
+        background: rgba(50, 44, 84, 0.9);
+        color: #e4e0ff;
+        border: 1px solid #2d3a5a;
+    }
+
+    body.dark-mode .post-meta {
+        color: #8bb6f7;
+    }
+
+    body.dark-mode .view-btn {
+        background: var(--gradient-primary);
+    }
+
+    body.dark-mode .view-btn:hover {
+        background: var(--gradient-primary);
+    }
+</style>
+
+<div class="container post-container">
+    <div class="student-box">
+        <h1 class="mb-4" style="font-size: 2.5rem; font-weight: bold; color: #2563eb; text-align: center;">My Posts</h1>
+
+        <!-- New Post Form -->
+        <form method="POST" class="post-form">
+            <div class="mb-3">
+                <textarea name="content" rows="4" placeholder="Write something..." required></textarea>
+            </div>
+            <div style="text-align: center;">
+                <button type="submit" class="view-btn">Post</button>
+            </div>
+        </form>
+
+        <hr style="margin: 2rem 0;">
+
+        <h2 style="font-size: 1.75rem; font-weight: 600; color: #1e3a8a; margin-bottom: 1rem;">Already posted</h2>
+
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post-box">
+                    {% if post.image_url %}
+                        <img src="{{ post.image_url }}" alt="Post image" class="post-image">
+                    {% endif %}
+
+                    <p style="font-size: 1.125rem; font-weight: 500;">{{ post.content }}</p>
+
+                    {% if post.timestamp %}
+                        <div class="post-meta">
+                            Posted on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                        </div>
+                    {% endif %}
+
+                    <div class="post-actions">
+                        <!-- Edit Link -->
+                        <a href="{{ url_for('student.edit_post', post_id=post.id) }}" class="link-style">Edit</a>
+
+                        <!-- Delete Link with Hidden Form -->
+                        <a href="#" onclick="event.preventDefault(); this.nextElementSibling.submit();" class="link-style">
+                            Delete
+                        </a>
+                        <form action="{{ url_for('student.delete_post', post_id=post.id) }}" method="POST" style="display: none;"></form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-posts">You haven't posted anything yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

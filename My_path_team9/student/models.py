@@ -1,8 +1,13 @@
+from datetime import datetime
+
 from .. import db
 
 class Survey(db.Model):
     __tablename__ = 'survey'
     id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', backref='surveys')
 
     class_section = db.Column(db.String(10), nullable=False)
     study_time = db.Column(db.String(20), nullable=False)
@@ -32,3 +37,30 @@ class VideoSubmission(db.Model):
     confirmed = db.Column(db.Boolean, default=False)
 
     student = db.relationship('User', backref='video_submissions')
+
+
+from datetime import datetime
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String(255))  # Optional
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', backref='posts')
+    likes = db.relationship('Like', backref='post', cascade='all, delete-orphan')
+
+class Like(db.Model):
+    __tablename__ = 'likes'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+
+
+    # Optional: Unique constraint to prevent duplicate likes
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'post_id', name='unique_like'),
+    )
+
+

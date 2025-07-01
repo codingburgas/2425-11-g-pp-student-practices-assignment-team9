@@ -1,81 +1,438 @@
 {% extends "base.html" %}
 
-{% block title %}Tips{% endblock %}
+{% block title %}Your Classes{% endblock %}
 
 {% block content %}
-<style>
-  .content-box {
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 1000px;
-    margin: 20px auto;
-  }
+    <title>My Path - Your Classes</title>
+    <style>
 
-  .section {
-    margin-top: 10px;
-  }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
 
-  h1 {
-    text-align: center;
-  }
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 1s ease-out;
+        }
 
-</style>
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #1976d2, #42a5f5, #64b5f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-<h1>Your classes</h1><br>
+        .header p {
+            color: #546e7a;
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
 
-<div class="content-box">
-  <div class="section">
-    <h2>Computer sciences teachers</h2>
-    <ul>
-      <li>IT teacher - Ivan Vladimirov</li>
-      <li>Programing theory - George Ivanov</li>
-      <li>Programming, practice of the profession - George Ivanov</li>
-    </ul>
-  </div>
-</div>
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
 
-<div class="content-box">
-  <div class="section">
-    <h2>Social sciences teachers</h2>
-    <ul>
-      <li>History - Ivelina Todorova</li>
-      <li>Geography - Stamen Simeonov</li>
-      <li>Philosophy - Stanislav Ivanov</li>
-      <li>ZBUT - Teodora Ivanova</li>
-    </ul>
-  </div>
-</div>
+        .subject-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+            box-shadow: 0 8px 32px rgba(100, 181, 246, 0.1);
+        }
 
-<div class="content-box">
-  <div class="section">
-    <h2>Natural sciences teachers</h2>
-    <ul>
-      <li>Physics - George Barozov</li>
-      <li>Chemistry - Teodora Ivanova</li>
-      <li>Biology - Daniel Todorov</li>
-    </ul>
-  </div>
-</div>
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(100, 181, 246, 0.1), transparent);
+            transition: left 0.8s;
+        }
 
-    <div class="content-box">
-  <div class="section">
-    <h2>Mathematics teachers</h2>
-    <ul>
-      <li>Mathematics - Maria Todorova</li>
-      <li>Additional mathematics - Maria Todorova</li>
-    </ul>
-  </div>
-</div>
+        .subject-card:hover::before {
+            left: 100%;
+        }
 
-    <div class="content-box">
-  <div class="section">
-    <h2>Language teachers</h2>
-    <ul>
-      <li>Bulgarian - Anelina Koleva</li>
-      <li>English - Milena Dobrikova</li>
-      <li>German - Nina Dimitrova</li>
-    </ul>
-  </div>
-</div>
+        .subject-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(100, 181, 246, 0.2);
+            border-color: rgba(100, 181, 246, 0.4);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .subject-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .subject-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-right: 20px;
+            background: linear-gradient(45deg, #64b5f6, #42a5f5);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(100, 181, 246, 0.3);
+        }
+
+        .subject-card:hover .subject-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .subject-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1976d2;
+        }
+
+        .teachers-list {
+            list-style: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .teacher-item {
+            background: rgba(100, 181, 246, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            border-left: 4px solid rgba(100, 181, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .teacher-item:hover {
+            background: rgba(100, 181, 246, 0.2);
+            transform: translateX(10px);
+            border-left-color: #42a5f5;
+        }
+
+        .teacher-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .subject-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .teacher-name {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .teacher-status {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            margin-left: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 32px rgba(100, 181, 246, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(100, 181, 246, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #546e7a;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subject-card:nth-child(1) { animation-delay: 0.1s; }
+        .subject-card:nth-child(2) { animation-delay: 0.2s; }
+        .subject-card:nth-child(3) { animation-delay: 0.3s; }
+        .subject-card:nth-child(4) { animation-delay: 0.4s; }
+        .subject-card:nth-child(5) { animation-delay: 0.5s; }
+
+        @media (max-width: 768px) {
+            .classes-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .subject-card {
+                padding: 20px;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+<body>
+    <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Your Classes</h1>
+            <p>Explore your academic journey across different subjects</p>
+        </div>
+
+        <div class="classes-grid">
+            <!-- Computer Sciences -->
+            <div class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-icon">💻</div>
+                    <h2 class="subject-title">Computer Sciences</h2>
+                </div>
+                <ul class="teachers-list">
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">IT Teacher</span>
+                            <span class="teacher-name">Ivan Vladimirov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Programming Theory</span>
+                            <span class="teacher-name">George Ivanov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Programming Practice</span>
+                            <span class="teacher-name">George Ivanov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Social Sciences -->
+            <div class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-icon">🌍</div>
+                    <h2 class="subject-title">Social Sciences</h2>
+                </div>
+                <ul class="teachers-list">
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">History</span>
+                            <span class="teacher-name">Ivelina Todorova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Geography</span>
+                            <span class="teacher-name">Stamen Simeonov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Philosophy</span>
+                            <span class="teacher-name">Stanislav Ivanov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">ZBUT</span>
+                            <span class="teacher-name">Teodora Ivanova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Natural Sciences -->
+            <div class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-icon">🔬</div>
+                    <h2 class="subject-title">Natural Sciences</h2>
+                </div>
+                <ul class="teachers-list">
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Physics</span>
+                            <span class="teacher-name">George Barozov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Chemistry</span>
+                            <span class="teacher-name">Teodora Ivanova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Biology</span>
+                            <span class="teacher-name">Daniel Todorov</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Mathematics -->
+            <div class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-icon">📊</div>
+                    <h2 class="subject-title">Mathematics</h2>
+                </div>
+                <ul class="teachers-list">
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Mathematics</span>
+                            <span class="teacher-name">Maria Todorova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Additional Mathematics</span>
+                            <span class="teacher-name">Maria Todorova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Languages -->
+            <div class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-icon">🗣️</div>
+                    <h2 class="subject-title">Languages</h2>
+                </div>
+                <ul class="teachers-list">
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">Bulgarian</span>
+                            <span class="teacher-name">Anelina Koleva</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">English</span>
+                            <span class="teacher-name">Milena Dobrikova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                    <li class="teacher-item">
+                        <div class="teacher-info">
+                            <span class="subject-name">German</span>
+                            <span class="teacher-name">Nina Dimitrova</span>
+                        </div>
+                        <div class="teacher-status"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Subject Areas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">13</div>
+                <div class="stat-label">Teachers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">Classes</div>
+            </div>
+        </div>
+    </div>
+</body>
+
 {% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+
+.send-video-container {
+  max-width: 600px;
+  margin: 3rem auto 0 auto;
+  padding: 0 1rem;
+}
+
+.send-video-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+.send-video-header .header-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.15);
+  animation: popIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.send-video-header .header-title {
+  font-size: 2.3rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.7); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.send-video-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(18px);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(59,130,246,0.10);
+  border: 1.5px solid rgba(59,130,246,0.13);
+  padding: 2.5rem 2rem 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.send-video-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.send-video-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.7rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.form-label {
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.5px;
+}
+.form-input {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border: 2px solid #e3eafc;
+  border-radius: 13px;
+  font-size: 1.05rem;
+  background: rgba(255,255,255,0.97);
+  color: #2563eb;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-family: inherit;
+}
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.13);
+  background: #f5faff;
+}
+.form-input::placeholder {
+  color: #a0b7e6;
+  font-weight: 400;
+}
+
+.send-btn {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 1rem 2.2rem;
+  border-radius: 13px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 18px rgba(59,130,246,0.10);
+}
+.send-btn:hover, .send-btn:focus {
+  background: var(--gradient-primary);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.13);
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e3eafc;
+}
+.form-footer p {
+  color: #2563eb;
+  font-size: 0.97rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+  .send-video-card {
+    padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+  }
+  .send-video-header .header-title {
+    font-size: 1.3rem;
+  }
+}
+</style>
+
+<div class="send-video-container">
+  <div class="send-video-header">
+    <div class="header-icon">🎬</div>
+    <div class="header-title">Send Video</div>
+  </div>
+  <div class="send-video-card">
+    <form method="POST" class="send-video-form" id="videoForm">
+      <div class="form-group">
+        <label for="title" class="form-label">Video Title</label>
+        <input id="title" name="title" class="form-input" placeholder="Enter a compelling title for your video" required>
+      </div>
+      <div class="form-group">
+        <label for="link" class="form-label">Video Link</label>
+        <input id="link" name="link" type="url" class="form-input" placeholder="https://youtube.com/watch?v=...">
+      </div>
+      <button type="submit" class="send-btn">
+        <span class="btn-icon">🎬</span>
+        Add Video
+      </button>
+    </form>
+    <div class="form-footer">
+      <p>Supported platforms: YouTube and other video sharing sites</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,6 +1,472 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h1>Welcome, {{ current_user.username }}!</h1>
-<p>This is your student dashboard.</p>
+
+<style>
+  @keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1a73e8, #1a73e8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 30px rgba(255,255,255,0.3);
+    position: relative;
+    z-index: 2;
+  }
+
+  .text-muted {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .my-4 {
+    margin: 2rem 0;
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  }
+
+  .h4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a73e8;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(255,255,255,0.3);
+    position: relative;
+    z-index: 2;
+  }
+
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .video-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+  }
+
+  .video-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .video-card:hover::before {
+    left: 100%;
+  }
+
+  .video-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+  }
+
+  .video-header {
+    position: relative;
+    min-height: 60px;
+    margin-bottom: 1.5rem;
+  }
+
+  .video-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #1a73e8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+  }
+
+  .video-title-wrapper {
+    margin-left: 72px;
+    display: flex;
+    align-items: flex-start;
+    min-height: 60px;
+  }
+
+  .video-content-align {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    min-height: 3.6em; /* Ensures two lines of space for all titles */
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .btn-watch {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.45rem 1rem;
+    font-size: 0.93rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    min-width: unset;
+    width: auto;
+  }
+
+  .btn-watch:hover {
+    background: var(--gradient-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+    text-decoration: none;
+    color: white;
+  }
+
+  .rating-section {
+    margin-bottom: 1rem;
+  }
+
+  .rating-section strong {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .rating-stars {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .star {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    transition: all 0.2s ease;
+  }
+
+  .star.empty {
+    color: #e2e8f0;
+    text-shadow: none;
+  }
+
+  .star:hover {
+    transform: scale(1.2);
+  }
+
+  .rating-info {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .rate-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(79, 172, 254, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    margin-top: auto;
+  }
+
+  .form-select-sm {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 2px solid rgba(79, 172, 254, 0.3);
+    background: white;
+    color: #4a5568;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+  }
+
+  .form-select-sm:focus {
+    outline: none;
+    border-color: #4facfe;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+  }
+
+  .btn-rate {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  }
+
+  .no-videos {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    .videos-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .container {
+      padding: 1rem;
+    }
+
+    .hero-section {
+      padding: 2rem 1rem;
+    }
+
+    .video-card {
+      min-height: auto;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .videos-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .rate-form {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-select-sm {
+      width: 100%;
+    }
+  }
+
+  /* Animation for page load */
+  .video-card {
+    animation: slideInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .video-card:nth-child(1) { animation-delay: 0.1s; }
+  .video-card:nth-child(2) { animation-delay: 0.2s; }
+  .video-card:nth-child(3) { animation-delay: 0.3s; }
+  .video-card:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes slideInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="hero-section">
+    <h1 class="mb-3 text-center">Welcome, {{ current_user.username }}!</h1>
+    <p class="text-muted text-center">Your dashboard — here are your videos:</p>
+  </div>
+
+  {% if recommended_videos %}
+    <hr class="my-4">
+    <h2 class="h4 mb-3">🤖 AI-Recommended Videos For You</h2>
+    <div class="videos-grid">
+      {% for rec in recommended_videos %}
+        <div class="video-card">
+          <div>
+            <div class="video-header">
+              <div class="video-icon">🎬</div>
+              <div class="video-title-wrapper">
+                {% if rec.video.title %}
+                  <h3 class="video-title">{{ rec.video.title }}</h3>
+                {% endif %}
+              </div>
+            </div>
+            <div class="video-content-align">
+              {% set video_url = rec.video.video_link %}
+              {% if 'youtu.be/' in video_url %}
+                {% set video_id = video_url.split('youtu.be/')[-1].split('?')[0] %}
+              {% elif 'watch?v=' in video_url %}
+                {% set video_id = video_url.split('watch?v=')[-1].split('&')[0] %}
+              {% else %}
+                {% set video_id = video_url %}
+              {% endif %}
+              <img class="video-thumbnail" src="https://img.youtube.com/vi/{{ video_id }}/0.jpg" alt="Thumbnail" style="width:120px; border-radius:8px; margin-bottom:10px;">
+              <a href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank" rel="noopener noreferrer" class="btn-watch">
+                ▶️ Watch Now
+              </a>
+              <div class="video-reason" style="margin-top:10px; color:#1a73e8;">
+                {{ rec.reason }}
+              </div>
+              <span class="video-score" style="margin-top:8px; display:inline-block;">
+                Match: {{ (rec.score * 100)|int }}%
+              </span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <hr class="my-4">
+  <h2 class="h4 mb-3">🎥 Motivational Videos</h2>
+
+  {% if videos %}
+    <div class="videos-grid">
+      {% for video in videos %}
+        <div class="video-card">
+          <div>
+            <div class="video-header">
+              <div class="video-icon">🎬</div>
+              <div class="video-title-wrapper">
+                <h3 class="video-title">{{ video.video.title }}</h3>
+              </div>
+            </div>
+            <div class="video-content-align">
+              {% if video.video.video_link %}
+                <a href="{{ video.video.video_link }}" target="_blank" rel="noopener noreferrer" class="btn-watch">
+                  ▶️ Watch Now
+                </a>
+              {% else %}
+                <span class="rating-info">Video link not available</span>
+              {% endif %}
+              <div class="rating-section">
+                <strong>Your Rating:</strong>
+                <div>
+                  {% if video.my_rating %}
+                    {% for i in range(1, 6) %}
+                      {% if i <= video.my_rating %}
+                        <span class="star">★</span>
+                      {% else %}
+                        <span class="star empty">★</span>
+                      {% endif %}
+                    {% endfor %}
+                    <div class="rating-info">You rated this {{ video.my_rating }} star{% if video.my_rating != 1 %}s{% endif %}</div>
+                  {% else %}
+                    <span class="rating-info">Not rated yet</span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="rating-section">
+                <strong>Average Rating:</strong>
+                <div>
+                  {% if video.average_rating %}
+                    {% set avg = video.average_rating %}
+                    <span class="rating-stars" aria-label="Average rating: {{ "%.1f"|format(avg) }} out of 5 stars">
+                      {% for i in range(1, 6) %}
+                        {% if i <= avg %}
+                          <span class="star" aria-hidden="true">★</span>
+                        {% elif i - avg < 1 %}
+                          <span class="star" aria-hidden="true">★</span>
+                        {% else %}
+                          <span class="star empty" aria-hidden="true">★</span>
+                        {% endif %}
+                      {% endfor %}
+                    </span>
+                    <div class="rating-info">{{ "%.1f"|format(avg) }} out of 5 stars</div>
+                  {% else %}
+                    <span class="rating-info">No ratings yet</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <form method="POST" action="{{ url_for('student.rate_video') }}" class="rate-form mt-3">
+            <input type="hidden" name="video_id" value="{{ video.video.id }}">
+            <select name="rating" class="form-select-sm" required>
+              <option value="" disabled selected>Rate this video</option>
+              {% for num in range(1, 6) %}
+                <option value="{{ num }}">{{ num }} ⭐</option>
+              {% endfor %}
+            </select>
+            <button class="btn-rate" type="submit">Rate</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="no-videos">
+      <p>No videos have been uploaded yet. 📹</p>
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+  // Add interactive effects
+  document.addEventListener('DOMContentLoaded', function() {
+    // Button click animations
+    document.querySelectorAll('.btn-watch, .btn-rate').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = 'scale(1)';
+        }, 150);
+      });
+    });
+
+    // Star hover effects
+    document.querySelectorAll('.star').forEach(star => {
+      star.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.2)';
+      });
+
+      star.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+  });
+</script>
 {% endblock %}

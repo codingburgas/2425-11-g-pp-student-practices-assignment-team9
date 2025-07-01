@@ -16,7 +16,7 @@
     }
 
     .video-submit-page .video-header h1 {
-        color: #4285f4;
+        color: #1557b0;
         font-size: 2.5rem;
         font-weight: 600;
         margin-bottom: 10px;
@@ -73,7 +73,7 @@
     }
 
     .video-submit-page .video-btn-submit {
-        background: linear-gradient(135deg, #4285f4, #1a73e8);
+        background: var(--gradient-primary);
         color: white;
         padding: 12px 32px;
         border: none;
@@ -82,13 +82,13 @@
         font-size: 16px;
         font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
     }
 
     .video-submit-page .video-btn-submit:hover {
-        background: linear-gradient(135deg, #1a73e8, #1557b0);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+        background: var(--gradient-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
     }
 
     .video-submit-page .video-btn-submit:active {
@@ -104,7 +104,7 @@
     }
 
     .video-submit-page .video-submissions-title {
-        color: #4285f4;
+        color: #1a73e8;
         font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 20px;
@@ -227,7 +227,7 @@
             <div class="video-form-group">
 <label class="video-form-label" for="{{ form.video_link.id }}">Video Link</label>
 <div class="video-input-icon">
-                    {{ form.video_link(class="video-form-input", placeholder="Paste your YouTube, Vimeo, or other video URL here...") }}
+                    {{ form.video_link(class="video-form-input", placeholder="Paste your YouTube or other video URL here...") }}
 </div>
                 {% for error in form.video_link.errors %}
 <span class="video-error-message">{{ error }}</span>

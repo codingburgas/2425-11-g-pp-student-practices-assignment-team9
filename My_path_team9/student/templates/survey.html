@@ -1,140 +1,913 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+/* Survey Container */
+.survey-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
-<form action="{{ url_for('student.survey') }}" method="POST">
+/* Progress Bar */
+.progress-container {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-large);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.progress-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-blue);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Main Survey Form */
+.survey-form {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  padding: 3rem;
+  box-shadow: var(--shadow-large);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.survey-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+/* Survey Header */
+.survey-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.survey-title {
+  font-size: 3rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.survey-subtitle {
+  font-size: 1.2rem;
+  color: var(--dark-blue);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.survey-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+  font-size: 2rem;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+/* Question Cards */
+.question-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.question-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.question-card:hover::before {
+  left: 100%;
+}
+
+.question-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.question-number {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 35px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.question-label {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--dark-blue);
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+  position: relative;
+}
+
+.question-label::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+/* Radio Button Styling */
+.radio-group {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.radio-option {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-option label {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 15px;
+  font-weight: 500;
+  color: var(--dark-blue);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.radio-option label::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  margin-right: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.radio-option label::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--primary-blue);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.radio-option:hover label {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateX(5px);
+}
+
+.radio-option input[type="radio"]:checked + label {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  font-weight: 600;
+  transform: translateX(5px);
+}
+
+.radio-option input[type="radio"]:checked + label::before {
+  border-color: var(--primary-blue);
+}
+
+.radio-option input[type="radio"]:checked + label::after {
+  opacity: 1;
+}
+
+/* Checkbox Styling */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.checkbox-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkbox-option label {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  font-weight: 500;
+  color: var(--dark-blue);
+  transition: all 0.3s ease;
+}
+
+.checkbox-option label::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.checkbox-option label::after {
+  content: '✓';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.checkbox-option:hover label {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.checkbox-option input[type="checkbox"]:checked + label {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.checkbox-option input[type="checkbox"]:checked + label::before {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.checkbox-option input[type="checkbox"]:checked + label::after {
+  opacity: 1;
+}
+
+/* Select Styling */
+.select-group {
+  margin-top: 1.5rem;
+}
+
+.select-group select {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--dark-blue);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%233B82F6' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 3rem;
+}
+
+.select-group select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.select-group select:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Submit Button */
+.submit-section {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(59, 130, 246, 0.1);
+}
+
+.submit-button {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 1.2rem 3rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.submit-button:hover::before {
+  left: 100%;
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+}
+
+.submit-button:active {
+  transform: translateY(-1px);
+}
+
+/* Dark Mode Support */
+body.dark-mode .survey-form {
+  background: rgba(50, 44, 84, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .question-card {
+  background: rgba(50, 44, 84, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .question-label {
+  color: #e4e0ff;
+}
+
+body.dark-mode .radio-option label,
+body.dark-mode .checkbox-option label {
+  background: rgba(50, 44, 84, 0.8);
+  color: #e4e0ff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .select-group select {
+  background: rgba(50, 44, 84, 0.9);
+  color: #e4e0ff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .survey-container {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+
+  .survey-form {
+    padding: 2rem 1.5rem;
+  }
+
+  .survey-title {
+    font-size: 2.5rem;
+  }
+
+  .question-card {
+    padding: 1.5rem;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .submit-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+/* Animation for question cards */
+.question-card {
+  animation: slideInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.question-card:nth-child(1) { animation-delay: 0.1s; }
+.question-card:nth-child(2) { animation-delay: 0.2s; }
+.question-card:nth-child(3) { animation-delay: 0.3s; }
+.question-card:nth-child(4) { animation-delay: 0.4s; }
+.question-card:nth-child(5) { animation-delay: 0.5s; }
+.question-card:nth-child(6) { animation-delay: 0.6s; }
+.question-card:nth-child(7) { animation-delay: 0.7s; }
+.question-card:nth-child(8) { animation-delay: 0.8s; }
+.question-card:nth-child(9) { animation-delay: 0.9s; }
+.question-card:nth-child(10) { animation-delay: 1.0s; }
+.question-card:nth-child(11) { animation-delay: 1.1s; }
+.question-card:nth-child(12) { animation-delay: 1.2s; }
+.question-card:nth-child(13) { animation-delay: 1.3s; }
+.question-card:nth-child(14) { animation-delay: 1.4s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+</style>
+
+<div class="survey-container">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-title">Survey Progress</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Main Survey Form -->
+  <form class="survey-form" action="{{ url_for('student.survey') }}" method="POST">
     {{ form.csrf_token }}
 
-    <h2>Student Survey</h2>
+    <!-- Survey Header -->
+    <div class="survey-header">
+      <div class="survey-icon">📚</div>
+      <h1 class="survey-title">Student Learning Survey</h1>
+      <p class="survey-subtitle">Help us understand your learning preferences to provide better recommendations</p>
+    </div>
 
-    <div class="question">
-        <label>Which class and section are you in?</label><br>
-        <input type="radio" name="class_section" value="9A"> 9A<br>
-        <input type="radio" name="class_section" value="9B"> 9B<br>
-        <input type="radio" name="class_section" value="9C"> 9V<br>
-        <input type="radio" name="class_section" value="9D"> 9G
+    <!-- Question 1 -->
+    <div class="question-card">
+      <div class="question-number">1</div>
+      <div class="question-label">Which class and section are you in?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="class_section" value="9A" id="class_9A">
+          <label for="class_9A">9A</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="class_section" value="9B" id="class_9B">
+          <label for="class_9B">9B</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="class_section" value="9V" id="class_9V">
+          <label for="class_9V">9V</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="class_section" value="9G" id="class_9G">
+          <label for="class_9G">9G</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>How many hours a day do you study outside school?</label><br>
-        <input type="radio" name="study_time" value="under_1"> Less than 1 hour<br>
-        <input type="radio" name="study_time" value="1_2"> 1–2 hours<br>
-        <input type="radio" name="study_time" value="2_3"> 2–3 hours<br>
-        <input type="radio" name="study_time" value="over_3"> More than 3 hours
+
+    <!-- Question 2 -->
+    <div class="question-card">
+      <div class="question-number">2</div>
+      <div class="question-label">How many hours a day do you study outside school?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="study_time" value="under_1" id="study_under_1">
+          <label for="study_under_1">Less than 1 hour</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="study_time" value="1_2" id="study_1_2">
+          <label for="study_1_2">1–2 hours</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="study_time" value="2_3" id="study_2_3">
+          <label for="study_2_3">2–3 hours</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="study_time" value="over_3" id="study_over_3">
+          <label for="study_over_3">More than 3 hours</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>How interested are you in the school material?</label><br>
-        <input type="radio" name="interest_level" value="very_high"> Very high<br>
-        <input type="radio" name="interest_level" value="medium"> Medium<br>
-        <input type="radio" name="interest_level" value="low"> Low<br>
-        <input type="radio" name="interest_level" value="none"> Not interested
+
+    <!-- Question 3 -->
+    <div class="question-card">
+      <div class="question-number">3</div>
+      <div class="question-label">How interested are you in the school material?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="interest_level" value="very_high" id="interest_very_high">
+          <label for="interest_very_high">Very high</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="interest_level" value="medium" id="interest_medium">
+          <label for="interest_medium">Medium</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="interest_level" value="low" id="interest_low">
+          <label for="interest_low">Low</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="interest_level" value="none" id="interest_none">
+          <label for="interest_none">Not interested</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>How confident do you feel before tests/exams?</label><br>
-        <input type="radio" name="confidence" value="very"> Very confident<br>
-        <input type="radio" name="confidence" value="moderate"> Moderately confident<br>
-        <input type="radio" name="confidence" value="low"> Not very confident<br>
-        <input type="radio" name="confidence" value="stressed"> Stressed
+
+    <!-- Question 4 -->
+    <div class="question-card">
+      <div class="question-number">4</div>
+      <div class="question-label">How confident do you feel before tests/exams?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="confidence" value="very" id="confidence_very">
+          <label for="confidence_very">Very confident</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="confidence" value="moderate" id="confidence_moderate">
+          <label for="confidence_moderate">Moderately confident</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="confidence" value="low" id="confidence_low">
+          <label for="confidence_low">Not very confident</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="confidence" value="stressed" id="confidence_stressed">
+          <label for="confidence_stressed">Stressed</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>What’s your easiest way to remember information?</label><br>
-        <input type="radio" name="memory_method" value="notes"> Taking notes<br>
-        <input type="radio" name="memory_method" value="videos"> Watching videos<br>
-        <input type="radio" name="memory_method" value="repetition"> Repeating information
+
+    <!-- Question 5 -->
+    <div class="question-card">
+      <div class="question-number">5</div>
+      <div class="question-label">What's your easiest way to remember information?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="memory_method" value="notes" id="memory_notes">
+          <label for="memory_notes">Taking notes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="memory_method" value="videos" id="memory_videos">
+          <label for="memory_videos">Watching videos</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="memory_method" value="repetition" id="memory_repetition">
+          <label for="memory_repetition">Repeating information</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>How often do you use online learning resources (e.g., YouTube, video lessons)?</label><br>
-        <input type="radio" name="online_learning" value="daily"> Daily<br>
-        <input type="radio" name="online_learning" value="few_times"> Several times a week<br>
-        <input type="radio" name="online_learning" value="rarely"> Rarely<br>
-        <input type="radio" name="online_learning" value="never"> Never
+
+    <!-- Question 6 -->
+    <div class="question-card">
+      <div class="question-number">6</div>
+      <div class="question-label">How often do you use online learning resources?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="online_learning" value="daily" id="online_daily">
+          <label for="online_daily">Daily</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="online_learning" value="few_times" id="online_few_times">
+          <label for="online_few_times">Several times a week</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="online_learning" value="rarely" id="online_rarely">
+          <label for="online_rarely">Rarely</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="online_learning" value="never" id="online_never">
+          <label for="online_never">Never</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>Which subject do you find most difficult?</label><br>
+
+    <!-- Question 7 -->
+    <div class="question-card">
+      <div class="question-number">7</div>
+      <div class="question-label">Which subject do you find most difficult?</div>
+      <div class="select-group">
         <select name="hardest_subject">
-            <option value="Natural sciences">Natural sciences</option>
-            <option value="mathematics">Mathematics</option>
-            <option value="languages">Languages</option>
-            <option value="social sciences">Social sciences</option>
-            <option value="Computer sciences">Computer sciences</option>
-            <option value="other">Other</option>
+          <option value="Natural sciences">Natural sciences</option>
+          <option value="mathematics">Mathematics</option>
+          <option value="languages">Languages</option>
+          <option value="social sciences">Social sciences</option>
+          <option value="Computer sciences">Computer sciences</option>
+          <option value="other">Other</option>
         </select>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>What is your favorite school subject?</label><br>
+
+    <!-- Question 8 -->
+    <div class="question-card">
+      <div class="question-number">8</div>
+      <div class="question-label">What is your favorite school subject?</div>
+      <div class="select-group">
         <select name="favorite_subject">
-            <option value="Natural sciences">Natural sciences</option>
-            <option value="mathematics">Mathematics</option>
-            <option value="languages">Languages</option>
-            <option value="social sciences">Social sciences</option>
-            <option value="Computer sciences">Computer sciences</option>
-            <option value="other">Other</option>
+          <option value="Natural sciences">Natural sciences</option>
+          <option value="mathematics">Mathematics</option>
+          <option value="languages">Languages</option>
+          <option value="social sciences">Social sciences</option>
+          <option value="Computer sciences">Computer sciences</option>
+          <option value="other">Other</option>
         </select>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>How much time do you spend on social media/games daily?</label><br>
-        <input type="radio" name="social_time" value="under_1"> Less than 1 hour<br>
-        <input type="radio" name="social_time" value="1_3"> 1–3 hours<br>
-        <input type="radio" name="social_time" value="over_3"> More than 3 hours
+
+    <!-- Question 9 -->
+    <div class="question-card">
+      <div class="question-number">9</div>
+      <div class="question-label">How much time do you spend on social media/games daily?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="social_time" value="under_1" id="social_under_1">
+          <label for="social_under_1">Less than 1 hour</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="social_time" value="1_3" id="social_1_3">
+          <label for="social_1_3">1–3 hours</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="social_time" value="over_3" id="social_over_3">
+          <label for="social_over_3">More than 3 hours</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>Which platforms do you use most for video lessons?</label><br>
-        <input type="checkbox" name="video_platforms" value="youtube"> YouTube<br>
-        <input type="checkbox" name="video_platforms" value="ucha_se"> Ucha.se<br>
-        <input type="checkbox" name="video_platforms" value="khan"> Khan Academy<br>
-        <input type="checkbox" name="video_platforms" value="online_school"> Online School
+
+    <!-- Question 10 -->
+    <div class="question-card">
+      <div class="question-number">10</div>
+      <div class="question-label">Which platforms do you use most for video lessons?</div>
+      <div class="checkbox-group">
+        <div class="checkbox-option">
+          <input type="checkbox" name="video_platforms" value="youtube" id="platform_youtube">
+          <label for="platform_youtube">YouTube</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" name="video_platforms" value="ucha_se" id="platform_ucha_se">
+          <label for="platform_ucha_se">Ucha.se</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" name="video_platforms" value="khan" id="platform_khan">
+          <label for="platform_khan">Khan Academy</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" name="video_platforms" value="online_school" id="platform_online_school">
+          <label for="platform_online_school">Online School</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>Do video lessons help you understand the material better?</label><br>
-        <input type="radio" name="video_helpful" value="very"> Very much<br>
-        <input type="radio" name="video_helpful" value="somewhat"> Somewhat<br>
-        <input type="radio" name="video_helpful" value="not_much"> Not really<br>
-        <input type="radio" name="video_helpful" value="not_at_all"> Not at all
+
+    <!-- Question 11 -->
+    <div class="question-card">
+      <div class="question-number">11</div>
+      <div class="question-label">Do video lessons help you understand the material better?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="video_helpful" value="very" id="helpful_very">
+          <label for="helpful_very">Very much</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="video_helpful" value="somewhat" id="helpful_somewhat">
+          <label for="helpful_somewhat">Somewhat</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="video_helpful" value="not_much" id="helpful_not_much">
+          <label for="helpful_not_much">Not really</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="video_helpful" value="not_at_all" id="helpful_not_at_all">
+          <label for="helpful_not_at_all">Not at all</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>What are the most important qualities of a good video lesson?</label><br>
-        <input type="checkbox" name="lesson_quality" value="short_clear"> Short and clear<br>
-        <input type="checkbox" name="lesson_quality" value="examples"> With examples and exercises<br>
-        <input type="checkbox" name="lesson_quality" value="visuals"> With visuals and animations<br>
-        <input type="checkbox" name="lesson_quality" value="slow_clear"> Explained slowly and clearly
+
+    <!-- Question 12 -->
+    <div class="question-card">
+      <div class="question-number">12</div>
+      <div class="question-label">What are the most important qualities of a good video lesson?</div>
+      <div class="checkbox-group">
+        <div class="checkbox-option">
+          <input type="checkbox" name="lesson_quality" value="short_clear" id="quality_short_clear">
+          <label for="quality_short_clear">Short and clear</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" name="lesson_quality" value="examples" id="quality_examples">
+          <label for="quality_examples">With examples and exercises</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" name="lesson_quality" value="visuals" id="quality_visuals">
+          <label for="quality_visuals">With visuals and animations</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" name="lesson_quality" value="slow_clear" id="quality_slow_clear">
+          <label for="quality_slow_clear">Explained slowly and clearly</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>What is the ideal length of a video lesson?</label><br>
-        <input type="radio" name="ideal_length" value="under_5"> Less than 5 minutes<br>
-        <input type="radio" name="ideal_length" value="5_10"> 5–10 minutes<br>
-        <input type="radio" name="ideal_length" value="10_20"> 10–20 minutes<br>
-        <input type="radio" name="ideal_length" value="doesnt_matter"> Doesn’t matter as long as it’s useful
+
+    <!-- Question 13 -->
+    <div class="question-card">
+      <div class="question-number">13</div>
+      <div class="question-label">What is the ideal length of a video lesson?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="ideal_length" value="under_5" id="length_under_5">
+          <label for="length_under_5">Less than 5 minutes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="ideal_length" value="5_10" id="length_5_10">
+          <label for="length_5_10">5–10 minutes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="ideal_length" value="10_20" id="length_10_20">
+          <label for="length_10_20">10–20 minutes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="ideal_length" value="doesnt_matter" id="length_doesnt_matter">
+          <label for="length_doesnt_matter">Doesn't matter as long as it's useful</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>Do you watch video lessons when preparing for tests?</label><br>
-        <input type="radio" name="videos_for_tests" value="always"> Always<br>
-        <input type="radio" name="videos_for_tests" value="sometimes"> Sometimes<br>
-        <input type="radio" name="videos_for_tests" value="only_if_needed"> Only if I don’t understand<br>
-        <input type="radio" name="videos_for_tests" value="never"> Never
+
+    <!-- Question 14 -->
+    <div class="question-card">
+      <div class="question-number">14</div>
+      <div class="question-label">Do you watch video lessons when preparing for tests?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="videos_for_tests" value="always" id="tests_always">
+          <label for="tests_always">Always</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="videos_for_tests" value="sometimes" id="tests_sometimes">
+          <label for="tests_sometimes">Sometimes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="videos_for_tests" value="only_if_needed" id="tests_only_if_needed">
+          <label for="tests_only_if_needed">Only if I don't understand</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="videos_for_tests" value="never" id="tests_never">
+          <label for="tests_never">Never</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="question">
-        <label>How often do you review lessons before class?</label><br>
-        <input type="radio" name="review_before_class" value="always"> Always<br>
-        <input type="radio" name="review_before_class" value="sometimes"> Sometimes<br>
-        <input type="radio" name="review_before_class" value="never"> Never
+
+    <!-- Question 15 -->
+    <div class="question-card">
+      <div class="question-number">15</div>
+      <div class="question-label">How often do you review lessons before class?</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="review_before_class" value="always" id="review_always">
+          <label for="review_always">Always</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="review_before_class" value="sometimes" id="review_sometimes">
+          <label for="review_sometimes">Sometimes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="review_before_class" value="never" id="review_never">
+          <label for="review_never">Never</label>
+        </div>
+      </div>
     </div>
-<br>
-    <div class="submit">
-        <button type="submit">Submit</button>
+
+    <!-- Submit Section -->
+    <div class="submit-section">
+      <button type="submit" class="submit-button">
+        <span>Submit Survey</span>
+        <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+      </button>
     </div>
-</form>
+  </form>
+</div>
+
+<script>
+// Progress bar functionality
+function updateProgress() {
+  const totalQuestions = 15;
+  const answeredQuestions = document.querySelectorAll('input:checked').length;
+  const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+
+  document.getElementById('progressFill').style.width = progressPercentage + '%';
+}
+
+// Add event listeners to all form inputs
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+  inputs.forEach(input => {
+    input.addEventListener('change', updateProgress);
+  });
+
+  // Initialize progress
+  updateProgress();
+});
+
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
 
 {% endblock %}

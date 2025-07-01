@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+
+.add-student-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.add-student-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #3b82f6);
+}
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.1);
+}
+.form-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+.form-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+.enhanced-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.form-group {
+  position: relative;
+}
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2c3e50;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 1);
+}
+.form-input::placeholder {
+  color: rgba(59, 130, 246, 0.6);
+  font-weight: 400;
+}
+.submit-section {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 2px solid rgba(59, 130, 246, 0.1);
+}
+.submit-button {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
+}
+.submit-button:active {
+  transform: translateY(-1px);
+}
+@media (max-width: 768px) {
+  .add-student-card {
+    padding: 1.5rem;
+  }
+  .enhanced-form {
+    grid-template-columns: 1fr;
+  }
+}
+.form-header.students-list-header {
+  justify-content: center;
+  text-align: center;
+  margin-top: 2rem;
+}
+.form-title.students-list-title {
+  color: #2563eb;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.card-title {
+  min-height: 56px;
+  display: flex;
+  align-items: flex-end;
+}
+</style>
+
+<div class="container py-4">
+  <!-- Modern Add Student Form -->
+  <div class="add-student-card">
+    <div class="form-header">
+      <div class="form-icon">➕</div>
+      <h2 class="form-title">Add New Student</h2>
+    </div>
+    <form method="POST" class="enhanced-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" class="form-input" placeholder="Enter username" required>
+      </div>
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" placeholder="Enter email address" required>
+      </div>
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-input" placeholder="Enter password" required>
+      </div>
+      <div class="submit-section">
+        <button type="submit" class="submit-button">Create Student</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Plain Students List Table -->
+  <div class="form-header students-list-header">
+    <div class="form-icon">📋</div>
+    <h2 class="form-title students-list-title">Students List</h2>
+  </div>
+  {% if students %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.username }}</td>
+          <td>{{ student.email }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('teacher.delete_student', user_id=student.id) }}" onsubmit="return confirm('Are you sure you want to delete {{ student.username }}?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Delete student {{ student.username }}">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p>No registered students.</p>
+  {% endif %}
+</div>
+{% endblock %}
