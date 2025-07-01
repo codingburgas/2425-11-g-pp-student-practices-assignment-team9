@@ -187,14 +187,16 @@
     <p class="page-subtitle">Manage your account and preferences</p>
   </div>
 
-  <!-- Personal Information Card -->
-  <div class="settings-card">
-    <div class="card-header">
-      <div class="card-icon">📝</div>
-      <h2 class="card-title">Personal Information</h2>
-    </div>
-    <form method="POST" class="enhanced-form">
-      {{ form.hidden_tag() }}
+  <!-- BEGIN FORM -->
+  <form method="POST" class="enhanced-form">
+    {{ form.hidden_tag() }}
+
+    <!-- Personal Information Card -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-icon">📝</div>
+        <h2 class="card-title">Personal Information</h2>
+      </div>
       <div class="form-group">
         <label for="username" class="form-label">Username</label>
         {{ form.username(class="form-input", placeholder="Enter your username") }}
@@ -203,16 +205,14 @@
         <label for="email" class="form-label">Email Address</label>
         {{ form.email(class="form-input", placeholder="Enter your email address") }}
       </div>
-    </form>
-  </div>
-
-  <!-- Password Change Card -->
-  <div class="settings-card">
-    <div class="card-header">
-      <div class="card-icon">🔒</div>
-      <h2 class="card-title">Change Password</h2>
     </div>
-    <form method="POST" class="enhanced-form" id="password-form">
+
+    <!-- Password Change Card -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-icon">🔒</div>
+        <h2 class="card-title">Change Password</h2>
+      </div>
       <div class="form-group">
         <label for="current_password" class="form-label">Current Password</label>
         {{ form.current_password(class="form-input", placeholder="Enter your current password") }}
@@ -225,12 +225,16 @@
         <label for="confirm_password" class="form-label">Confirm New Password</label>
         {{ form.confirm_password(class="form-input", placeholder="Confirm your new password") }}
       </div>
-      <div class="submit-section">
-        <button type="submit" class="submit-button">
-          {{ form.submit.label.text }}
-        </button>
-      </div>
-    </form>
-  </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="submit-section">
+      <button type="submit" class="submit-button">
+        {{ form.submit.label.text }}
+      </button>
+    </div>
+  </form>
+  <!-- END FORM -->
 </div>
+
 {% endblock %}
