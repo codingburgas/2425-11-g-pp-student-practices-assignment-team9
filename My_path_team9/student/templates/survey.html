@@ -346,6 +346,179 @@
   opacity: 1;
 }
 
+/* Select Styling */
+.select-group {
+  margin-top: 1.5rem;
+}
+
+.select-group select {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--dark-blue);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%233B82F6' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 3rem;
+}
+
+.select-group select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.select-group select:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Submit Button */
+.submit-section {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(59, 130, 246, 0.1);
+}
+
+.submit-button {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 1.2rem 3rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.submit-button:hover::before {
+  left: 100%;
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+}
+
+.submit-button:active {
+  transform: translateY(-1px);
+}
+
+/* Dark Mode Support */
+body.dark-mode .survey-form {
+  background: rgba(50, 44, 84, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .question-card {
+  background: rgba(50, 44, 84, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .question-label {
+  color: #e4e0ff;
+}
+
+body.dark-mode .radio-option label,
+body.dark-mode .checkbox-option label {
+  background: rgba(50, 44, 84, 0.8);
+  color: #e4e0ff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .select-group select {
+  background: rgba(50, 44, 84, 0.9);
+  color: #e4e0ff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .survey-container {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+
+  .survey-form {
+    padding: 2rem 1.5rem;
+  }
+
+  .survey-title {
+    font-size: 2.5rem;
+  }
+
+  .question-card {
+    padding: 1.5rem;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .submit-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+/* Animation for question cards */
+.question-card {
+  animation: slideInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.question-card:nth-child(1) { animation-delay: 0.1s; }
+.question-card:nth-child(2) { animation-delay: 0.2s; }
+.question-card:nth-child(3) { animation-delay: 0.3s; }
+.question-card:nth-child(4) { animation-delay: 0.4s; }
+.question-card:nth-child(5) { animation-delay: 0.5s; }
+.question-card:nth-child(6) { animation-delay: 0.6s; }
+.question-card:nth-child(7) { animation-delay: 0.7s; }
+.question-card:nth-child(8) { animation-delay: 0.8s; }
+.question-card:nth-child(9) { animation-delay: 0.9s; }
+.question-card:nth-child(10) { animation-delay: 1.0s; }
+.question-card:nth-child(11) { animation-delay: 1.1s; }
+.question-card:nth-child(12) { animation-delay: 1.2s; }
+.question-card:nth-child(13) { animation-delay: 1.3s; }
+.question-card:nth-child(14) { animation-delay: 1.4s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 
 </style>
