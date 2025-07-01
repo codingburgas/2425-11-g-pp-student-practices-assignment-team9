@@ -248,6 +248,105 @@
   transition: all 0.3s ease;
 }
 
+.radio-option:hover label {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateX(5px);
+}
+
+.radio-option input[type="radio"]:checked + label {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  font-weight: 600;
+  transform: translateX(5px);
+}
+
+.radio-option input[type="radio"]:checked + label::before {
+  border-color: var(--primary-blue);
+}
+
+.radio-option input[type="radio"]:checked + label::after {
+  opacity: 1;
+}
+
+/* Checkbox Styling */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.checkbox-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkbox-option label {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  font-weight: 500;
+  color: var(--dark-blue);
+  transition: all 0.3s ease;
+}
+
+.checkbox-option label::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.checkbox-option label::after {
+  content: '✓';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.checkbox-option:hover label {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.checkbox-option input[type="checkbox"]:checked + label {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.checkbox-option input[type="checkbox"]:checked + label::before {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.checkbox-option input[type="checkbox"]:checked + label::after {
+  opacity: 1;
+}
+
+
 
 </style>
 
